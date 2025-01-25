@@ -1,4 +1,4 @@
-import {Providers} from "@/app/components/providers";
+import {Providers} from "@/app/components/Providers";
 import Navbar_ from "@/app/components/Navbar_";
 import {ClerkProvider} from "@clerk/nextjs";
 import { huHU } from '@clerk/localizations'

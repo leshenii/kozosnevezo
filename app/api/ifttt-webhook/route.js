@@ -9,12 +9,12 @@ export async function POST(request, res) {
         });
     }
 
-    const { tiktokUrl } = await request.json();
+    const { url } = await request.json();
 
     try {
-        const url = await prisma.url.create({
+        const database_url = await prisma.url.create({
             data: {
-                tiktokUrl
+                url
             },
         });
 

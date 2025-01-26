@@ -15,7 +15,7 @@ export default function RootLayout({children}) {
         <ClerkProvider localization={huHU}>
             <html lang="en">
             <body
-                className="kozos-nevezo text-foreground bg-background"
+                className="kozos-nevezo text-foreground bg-background h-auto min-h-screen"
             >
             <header className="w-full">
                 <Navbar_/>

@@ -9,6 +9,9 @@
     "lint": "next lint",
     "postinstall": "prisma generate"
   },
+  "prisma": {
+    "seed": "tsx prisma/seeder/seeder.js"
+  },
   "dependencies": {
     "@clerk/localizations": "^3.10.0",
     "@clerk/nextjs": "^6.10.2",

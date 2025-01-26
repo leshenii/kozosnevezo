@@ -11,3 +11,24 @@ body {
 .h-screen-minus-navbar {
   @apply h-[calc(100vh-50px)];
 }
+
+.kanit-regular {
+  font-family: 'Kanit', Arial, Helvetica, sans-serif;
+  font-weight: 400;
+}
+
+.kanit-semibold {
+  font-family: 'Kanit', Arial, Helvetica, sans-serif;
+  font-weight: 500;
+}
+
+.kanit-bold {
+  font-family: 'Kanit', Arial, Helvetica, sans-serif;
+  font-weight: 700;
+}
+
+.title {
+  font-family: 'Kanit', Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  @apply text-6xl;
+}

@@ -9,12 +9,15 @@ export async function POST(request, res) {
         });
     }
 
-    const { url } = await request.json();
+    const { url, date } = await request.json();
+
+    const updatedUrl = url.replace('autoplay=1', 'autoplay=0') + '&mute=1';
 
     try {
         const database_url = await prisma.url.create({
             data: {
-                url
+                updatedUrl,
+                date
             },
         });
 
@@ -22,7 +25,7 @@ export async function POST(request, res) {
             status: 200,
         });
     } catch (error) {
-        console.error('Error fetching graph data:', error);
+        console.error('Error in IFTTT webhook:', error);
         return new Response('Internal Server Error', {
             status: 500,
         });
@@ -31,3 +34,27 @@ export async function POST(request, res) {
     }
 }
 
+export async function GET(request) {
+    if (request.method !== 'GET') {
+        return new Response('Method Not Allowed', {
+            status: 405,
+        });
+    }
+
+    try {
+        const urls = await prisma.url.findMany({
+            orderBy: [
+                { date: 'desc' },
+                { id: 'asc' }
+            ]
+        });
+        return Response.json(urls);
+    } catch (error) {
+        console.error('Error fetching URLs from database:', error);
+        return new Response('Internal Server Error', {
+            status: 500,
+        });
+    } finally {
+        await prisma.$disconnect();
+    }
+}

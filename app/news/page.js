@@ -3,7 +3,6 @@
 import {useEffect, useRef, useState} from "react";
 import {Button, Checkbox, CheckboxGroup} from "@heroui/react";
 import {Skeleton} from "@heroui/skeleton";
-import { InstagramEmbed } from 'react-social-media-embed';
 
 export default function NewsPage() {
 
@@ -12,6 +11,7 @@ export default function NewsPage() {
     const [visibleCount, setVisibleCount] = useState(12);
     const loaderRef = useRef(null);
     const [selected, setSelected] = useState(["tiktok", "instagram", "kozlemenyek"]);
+    const [isInvalid, setIsInvalid] = useState(false);
 
     const fetchUrls = async () => {
         await fetch('/api/ifttt-webhooks/tiktok', {
@@ -52,6 +52,16 @@ export default function NewsPage() {
         console.log(selected);
     }, [selected]);
 
+    const filteredUrls = urls.filter(url => {
+        if (selected.includes('tiktok') && url.url.includes('www.tiktok.com')) {
+            return true;
+        }
+        if (selected.includes('instagram') && url.url.includes('www.instagram.com')) {
+            return true;
+        }
+        return false;
+    });
+
     return (
         <>
             <div className='flex flex-row items-center w-full px-6'>
@@ -61,7 +71,11 @@ export default function NewsPage() {
                         defaultValue={["tiktok", "instagram", "kozlemenyek"]}
                         label="Jelöld be, milyen híreket szeretnél látni!"
                         value={selected}
-                        onValueChange={setSelected}
+                        isInvalid={isInvalid}
+                        onValueChange={(value) => {
+                            setIsInvalid(value.length < 1);
+                            setSelected(value);
+                        }}
                         orientation="horizontal"
                     >
                         <Checkbox value="tiktok">TikTok</Checkbox>
@@ -88,7 +102,7 @@ export default function NewsPage() {
                         ))}
                     </>
                 ) : (
-                    urls.slice(0, visibleCount).map((post, index) => (
+                    filteredUrls.slice(0, visibleCount).map((post, index) => (
                         <div key={index}>
                             <iframe
                                 width="100%"

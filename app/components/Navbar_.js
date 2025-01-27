@@ -45,13 +45,13 @@ export default function Navbar_() {
             <NavbarContent justify="end">
                 <NavbarItem>
                     {!isLoaded ? (
-                        <Button color="primary" radius="full" variant="solid" isDisabled>
+                        <Button size="lg" color="primary" radius="full" variant="solid" isDisabled>
                             <p className='kanit-semibold text-large'>Bejelentkezés</p>
                         </Button>
                     ) : (
                         <>
                             <SignedOut>
-                                <Button color="primary" radius="full" variant="solid"
+                                <Button size="lg" color="primary" radius="full" variant="solid"
                                         onPress={() => router.push('/sign-in')}>
                                     <p className='kanit-semibold text-large'>Bejelentkezés</p>
                                 </Button>

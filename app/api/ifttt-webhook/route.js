@@ -13,6 +13,8 @@ export async function POST(request, res) {
 
     const updatedUrl = url.replace('autoplay=1', 'autoplay=0') + '&mute=1';
 
+    console.log(url, updatedUrl, date)
+
     try {
         const database_url = await prisma.url.create({
             data: {

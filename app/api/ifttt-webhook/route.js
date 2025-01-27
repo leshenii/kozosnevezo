@@ -12,14 +12,15 @@ export async function POST(request, res) {
     const { url, date } = await request.json();
 
     const updatedUrl = url.replace('autoplay=1', 'autoplay=0') + '&mute=1';
+    const formattedDate = new Date(date).toISOString();
 
-    console.log(url, updatedUrl, date)
+    console.log(url, updatedUrl, date, formattedDate)
 
     try {
         const database_url = await prisma.url.create({
             data: {
                 url: updatedUrl,
-                date
+                date: formattedDate
             },
         });
 

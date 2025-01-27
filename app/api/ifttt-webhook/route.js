@@ -45,7 +45,7 @@ export async function GET(request) {
         const urls = await prisma.url.findMany({
             orderBy: [
                 { date: 'desc' },
-                { id: 'asc' }
+                { id: 'desc' }
             ]
         });
         return Response.json(urls);

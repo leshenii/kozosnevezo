@@ -1,13 +1,15 @@
 'use client'
 
-import {useEffect, useState} from "react";
-import {Button, Spinner} from "@heroui/react";
+import {useEffect, useRef, useState} from "react";
+import {Button} from "@heroui/react";
 import {Skeleton} from "@heroui/skeleton";
 
 export default function NewsPage() {
 
     const [isLoading, setIsLoading] = useState(true);
     const [urls, setUrls] = useState([])
+    const [visibleCount, setVisibleCount] = useState(12);
+    const loaderRef = useRef(null);
 
     const fetchUrls = async () => {
         await fetch('/api/ifttt-webhook', {
@@ -26,6 +28,24 @@ export default function NewsPage() {
         fetchUrls();
     }, []);
 
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                setVisibleCount((prevCount) => prevCount + 12);
+            }
+        }, { threshold: 1.0 });
+
+        if (loaderRef.current) {
+            observer.observe(loaderRef.current);
+        }
+
+        return () => {
+            if (loaderRef.current) {
+                observer.unobserve(loaderRef.current);
+            }
+        };
+    }, []);
+
     return (
         <>
             <div className='flex flex-row items-center w-full px-6'>
@@ -35,40 +55,21 @@ export default function NewsPage() {
                 <div className="w-1/6 text-right">
                     <Button color="primary" radius="full" variant="solid"
                             onPress={() => router.push('/sign-in')}>
-                        <p className='kanit-semibold text-large'>Új hírt írok</p>
+                        <p className='kanit-semibold text-large'>Új hírt közlök</p>
                     </Button>
                 </div>
             </div>
             <div className="grid grid-cols-4 w-11/12 gap-4 mb-4">
                 {isLoading ? (
                     <>
-                        <Skeleton className="">
-                            <div className="h-[350px] w-[100%] rounded-lg bg-default-300"/>
-                        </Skeleton>
-                        <Skeleton className="">
-                            <div className="h-[350px] w-[100%] rounded-lg bg-default-300"/>
-                        </Skeleton>
-                        <Skeleton className="">
-                            <div className="h-[350px] w-[100%] rounded-lg bg-default-300"/>
-                        </Skeleton>
-                        <Skeleton className="">
-                            <div className="h-[350px] w-[100%] rounded-lg bg-default-300"/>
-                        </Skeleton>
-                        <Skeleton className="">
-                            <div className="h-[350px] w-[100%] rounded-lg bg-default-300"/>
-                        </Skeleton>
-                        <Skeleton className="">
-                            <div className="h-[350px] w-[100%] rounded-lg bg-default-300"/>
-                        </Skeleton>
-                        <Skeleton className="">
-                            <div className="h-[350px] w-[100%] rounded-lg bg-default-300"/>
-                        </Skeleton>
-                        <Skeleton className="">
-                            <div className="h-[350px] w-[100%] rounded-lg bg-default-300"/>
-                        </Skeleton>
+                        {[...Array(12)].map((_, index) => (
+                            <Skeleton key={index} className="">
+                                <div className="h-[350px] w-[100%] rounded-lg bg-default-300"/>
+                            </Skeleton>
+                        ))}
                     </>
                 ) : (
-                    urls.map((post, index) => (
+                    urls.slice(0, visibleCount).map((post, index) => (
                         <div key={index}>
                             <iframe
                                 width="100%"
@@ -79,6 +80,7 @@ export default function NewsPage() {
                     ))
                 )}
             </div>
+            <div ref={loaderRef} className="h-10"></div>
         </>
     )
         ;

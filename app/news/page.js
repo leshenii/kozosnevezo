@@ -3,6 +3,7 @@
 import {useEffect, useRef, useState} from "react";
 import {Button} from "@heroui/react";
 import {Skeleton} from "@heroui/skeleton";
+import { InstagramEmbed } from 'react-social-media-embed';
 
 export default function NewsPage() {
 
@@ -73,7 +74,7 @@ export default function NewsPage() {
                         <div key={index}>
                             <iframe
                                 width="100%"
-                                height="350"
+                                height="450"
                                 src={post.url}
                             />
                         </div>

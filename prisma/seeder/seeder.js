@@ -99,45 +99,270 @@ const posts = [
 
 const instagramPosts = [
     {
-        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        url: 'https://www.instagram.com/p/CrQ14R3I4gd/embed',
         date: null
     },
     {
-        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        url: 'https://www.instagram.com/p/Cral1Zko6je/embed',
         date: null
     },
     {
-        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        url: 'https://www.instagram.com/p/CriFUkOIpKw/embed',
         date: null
     },
     {
-        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        url: 'https://www.instagram.com/p/CsbZKPoonPi/embed',
         date: null
     },
     {
-        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        url: 'https://www.instagram.com/p/CtC3uNloQT_/embed',
         date: null
     },
     {
-        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        url: 'https://www.instagram.com/p/Ctyh8pwsBfr/embed',
         date: null
     },
     {
-        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        url: 'https://www.instagram.com/p/CtzS0eQxECh/embed',
         date: null
     },
     {
-        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        url: 'https://www.instagram.com/p/CtzaoRDMbHH/embed',
         date: null
     },
     {
-        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        url: 'https://www.instagram.com/p/Ct3uPOpMz6C/embed',
         date: null
-    }
+    },
+    {
+        url: 'https://www.instagram.com/p/Ct9K8Srs1Ju/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/Cu4Ubfvs7mv/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/Cu7Gy7wM_Ln/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/Cu9__nxsYIb/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CxFX_gxMVQF/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CxFwizHs5qc/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CxIxO1EMlo7/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CxYtHUEM0OK/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CxbRuhdsruj/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CxlIIdisaHn/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CxvF7iTMiOs/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CyLbdlsMnhr/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CyY68bjMtvl/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/Czo_E9ts7Nm/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/GsMLMG/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C0EO8oyMuyI/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C0lw5aYMusy/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C0ot49bsr6F/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C1XfgUhNuit/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C2ug6OXtrxd/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C3DaGBwN1Jx/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C5jLizvNbtx/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C5jMBNBtwsF/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C5yGNMgNVB7/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C5y0NtoNAmd/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C53CNustqDG/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C7MiiDAtxVL/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C7bTkOXtCcz/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C7bUZnaNIVK/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C8NdHQwt745/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C8p4FIsNkl_/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C8p8GsFtpDb/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C8uc56Qt6nx/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C8wPxVoNIA3/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C9KO_RviTPc/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C_iHdQENaTb/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C_kdplvtzvU/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C_k2Y-lNs3Z/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C_p0bjANAGe/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C_vZY10NBaj/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C_1e2clNnmk/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/C_8JtfAtz51/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/DA5tU9WtWOE/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/DBHAbyZtZuj/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/DBWKCsRNLef/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/DBa-NlVIdqb/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/DBdaP7HOsVp/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/DBv5MgxIGSM/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/DB4K_3bNKX5/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/DCWvrFWNUfw/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/DCZ1HB3Reo_/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/DCi-bARO4Hm/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/DD60HP3Nj8f/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/DEIsPYZxnLo/embed',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/DFAAX1ONG_6/embed',
+        date: null
+    },
 ]
 
 async function seed() {
-    const post = await prisma.url.createMany({
+
+    const instaPostsArray = await prisma.url.createMany({
+        data: instagramPosts.map(post => ({...post})),
+    })
+
+    const postsArray = await prisma.url.createMany({
         data: posts.map(post => ({...post})),
     })
 

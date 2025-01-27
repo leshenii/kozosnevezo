@@ -98,9 +98,9 @@ export default function Navbar_() {
         <Navbar maxWidth="full" height="50px" shouldHideOnScroll className="py-3 bg-opacity-100">
             <NavbarBrand>
                 <Logo/>
-                <p className='kanit-bold text-3xl pl-2'>KÖZÖS NEVEZŐ</p>
+                <p style={{ cursor: 'pointer' }} onClick={() => router.push('/')} className='kanit-bold text-3xl pl-2'>KÖZÖS NEVEZŐ</p>
             </NavbarBrand>
-            <NavbarContent justify="center">
+            <NavbarContent justify="center" className="gap-8">
                 <NavbarItem>
                     <Link href="/news" className="kanit-semibold text-2xl">
                         Hírek
@@ -134,7 +134,7 @@ export default function Navbar_() {
                                 </Button>
                             </SignedOut>
                             <SignedIn>
-                                <UserButton/>
+                                <UserButton />
                             </SignedIn>
                         </>
                     )}

@@ -11,10 +11,8 @@ export async function POST(request, res) {
 
     const { url, date } = await request.json();
 
-    const updatedUrl = url.replace('autoplay=1', 'autoplay=0') + '&mute=1';
+    const updatedUrl = url.replace('instagr.am', 'www.instagram.com') + '/embed';
     const formattedDate = new Date(date).toISOString();
-
-    console.log(url, updatedUrl, date, formattedDate)
 
     try {
         const database_url = await prisma.url.create({
@@ -28,7 +26,7 @@ export async function POST(request, res) {
             status: 200,
         });
     } catch (error) {
-        console.error('Error in IFTTT webhook:', error);
+        console.error('Error in IFTTT instagram photo webhook:', error);
         return new Response(JSON.stringify({
             message: 'Internal Server Error',
             error: error.message,

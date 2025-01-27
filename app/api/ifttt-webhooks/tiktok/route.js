@@ -28,7 +28,7 @@ export async function POST(request, res) {
             status: 200,
         });
     } catch (error) {
-        console.error('Error in IFTTT webhook:', error);
+        console.error('Error in IFTTT tiktok webhook:', error);
         return new Response(JSON.stringify({
             message: 'Internal Server Error',
             error: error.message,

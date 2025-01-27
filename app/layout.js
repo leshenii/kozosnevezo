@@ -8,18 +8,24 @@ import "./globals.css";
 export const metadata = {
     title: "Közös Nevező Egyesület",
     description: "Erasmus+ projektek, pályázatok, együttműködések",
+    icons: {
+        icon: "/favicon.svg",
+        shortcut: "/favicon.svg",
+        apple: "/favicon.svg",
+    },
 };
 
 export default function RootLayout({children}) {
     return (
         <ClerkProvider localization={huHU}>
             <html lang="en">
+            <head>
+                <link rel="icon" href="/favicon.ico"/>
+            </head>
             <body
                 className="kozos-nevezo text-foreground bg-background h-auto min-h-screen"
             >
-            <header className="w-full">
-                <Navbar_/>
-            </header>
+            <Navbar_/>
             <Providers>
                 {children}
             </Providers>

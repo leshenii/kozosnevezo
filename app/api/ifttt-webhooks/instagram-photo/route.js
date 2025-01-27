@@ -29,8 +29,18 @@ export async function POST(request, res) {
         });
     } catch (error) {
         console.error('Error in IFTTT webhook:', error);
-        return new Response('Internal Server Error', {
+        return new Response(JSON.stringify({
+            message: 'Internal Server Error',
+            error: error.message,
+            url,
+            updatedUrl,
+            date,
+            formattedDate
+        }), {
             status: 500,
+            headers: {
+                'Content-Type': 'application/json'
+            }
         });
     } finally {
         await prisma.$disconnect();

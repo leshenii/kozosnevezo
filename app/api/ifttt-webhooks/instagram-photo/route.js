@@ -12,7 +12,7 @@ export async function POST(request, res) {
 
     const { url, date } = await request.json();
 
-    const updatedUrl = url.replace('instagr.am', 'www.instagram.com') + '/embed';
+    const updatedUrl = url.replace('instagr.am', 'www.instagram.com') + 'embed';
     const parsedDate = parse(date, 'MMMM d, yyyy \'at\' hh:mma', new Date());
     const formattedDate = parsedDate.toISOString();
 

@@ -1,7 +1,7 @@
 'use client'
 
 import {useEffect, useRef, useState} from "react";
-import {Button} from "@heroui/react";
+import {Button, Checkbox, CheckboxGroup} from "@heroui/react";
 import {Skeleton} from "@heroui/skeleton";
 import { InstagramEmbed } from 'react-social-media-embed';
 
@@ -11,6 +11,7 @@ export default function NewsPage() {
     const [urls, setUrls] = useState([])
     const [visibleCount, setVisibleCount] = useState(12);
     const loaderRef = useRef(null);
+    const [selected, setSelected] = useState(["tiktok", "instagram", "kozlemenyek"]);
 
     const fetchUrls = async () => {
         await fetch('/api/ifttt-webhooks/tiktok', {
@@ -47,10 +48,27 @@ export default function NewsPage() {
         };
     }, []);
 
+    useEffect(() => {
+        console.log(selected);
+    }, [selected]);
+
     return (
         <>
             <div className='flex flex-row items-center w-full px-6'>
-                <div className="w-2/6"></div>
+                <div className="w-2/6">
+                    <CheckboxGroup
+                        color="primary"
+                        defaultValue={["tiktok", "instagram", "kozlemenyek"]}
+                        label="Jelöld be, milyen híreket szeretnél látni!"
+                        value={selected}
+                        onValueChange={setSelected}
+                        orientation="horizontal"
+                    >
+                        <Checkbox value="tiktok">TikTok</Checkbox>
+                        <Checkbox value="instagram">Instagram</Checkbox>
+                        <Checkbox value="kozlemenyek">Közlemények</Checkbox>
+                    </CheckboxGroup>
+                </div>
                 <h1 className="m-5 title w-2/6 text-center">Hírek</h1>
                 <div className="w-1/6"></div>
                 <div className="w-1/6 text-right">

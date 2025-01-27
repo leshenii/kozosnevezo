@@ -12,7 +12,7 @@ export default function NewsPage() {
     const loaderRef = useRef(null);
 
     const fetchUrls = async () => {
-        await fetch('/api/ifttt-webhook', {
+        await fetch('/api/ifttt-webhooks/tiktok', {
             method: 'GET'
         })
             .then(response => response.json())

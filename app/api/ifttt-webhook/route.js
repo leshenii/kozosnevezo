@@ -16,7 +16,7 @@ export async function POST(request, res) {
     try {
         const database_url = await prisma.url.create({
             data: {
-                updatedUrl,
+                url: updatedUrl,
                 date
             },
         });

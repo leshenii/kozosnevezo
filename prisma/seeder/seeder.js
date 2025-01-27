@@ -97,6 +97,45 @@ const posts = [
     },
 ]
 
+const instagramPosts = [
+    {
+        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        date: null
+    },
+    {
+        url: 'https://www.instagram.com/p/CVXw6K7I9Y_/',
+        date: null
+    }
+]
+
 async function seed() {
     const post = await prisma.url.createMany({
         data: posts.map(post => ({...post})),

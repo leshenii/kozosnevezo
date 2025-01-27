@@ -53,7 +53,7 @@ export default function NewsPage() {
                 <h1 className="m-5 title w-2/6 text-center">Hírek</h1>
                 <div className="w-1/6"></div>
                 <div className="w-1/6 text-right">
-                    <Button color="primary" radius="full" variant="solid"
+                    <Button color="primary" radius="full" variant="ghost"
                             onPress={() => router.push('/sign-in')}>
                         <p className='kanit-semibold text-large'>Új hírt közlök</p>
                     </Button>

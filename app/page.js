@@ -1,4 +1,4 @@
-import {Button} from "@heroui/react";
+
 
 export default function Home() {
     return (
@@ -6,5 +6,4 @@ export default function Home() {
 
         </div>
     )
-        ;
 }

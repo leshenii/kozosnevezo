@@ -46,28 +46,3 @@ export async function POST(request, res) {
         await prisma.$disconnect();
     }
 }
-
-export async function GET(request) {
-    if (request.method !== 'GET') {
-        return new Response('Method Not Allowed', {
-            status: 405,
-        });
-    }
-
-    try {
-        const urls = await prisma.url.findMany({
-            orderBy: [
-                { date: 'desc' },
-                { id: 'desc' }
-            ]
-        });
-        return Response.json(urls);
-    } catch (error) {
-        console.error('Error fetching URLs from database:', error);
-        return new Response('Internal Server Error', {
-            status: 500,
-        });
-    } finally {
-        await prisma.$disconnect();
-    }
-}

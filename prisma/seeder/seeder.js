@@ -2,7 +2,7 @@ const {PrismaClient} = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
-const posts = [
+const tiktokPosts = [
     {
         url: 'https://www.tiktok.com/player/v1/7247449028600843546?music_info=1&description=1&autoplay=0&mute=1&loop=1&utm_campaign=tt4d_open_api&utm_source=awa6z07qoicg5jkx',
         date: null
@@ -356,14 +356,35 @@ const instagramPosts = [
     },
 ]
 
+const newsPosts = [
+    {
+        title: "Felállt a Közös Nevező Egyesület saját weboldala!",
+        content: `Lorem ipsum odor amet, consectetuer adipiscing elit. Etiam facilisis ullamcorper semper; maecenas facilisis viverra. Tempus nunc nulla class tincidunt suscipit parturient mollis. Nullam vestibulum enim nostra enim cubilia lacus malesuada. Aliquet sociosqu bibendum tristique rutrum integer. Maecenas tristique pulvinar magnis blandit mi arcu aenean suspendisse. Sapien per parturient, molestie suscipit curabitur erat dictumst. Magna est dui sociosqu facilisi himenaeos morbi habitasse. Hendrerit efficitur elementum pretium dis montes habitasse elit.
+
+Elit eget est orci at diam conubia. Magnis fermentum orci tellus magna ac nullam taciti feugiat. Vehicula aenean ligula aptent nunc laoreet. Sollicitudin varius pharetra mus mi mi, elit aenean. Fusce curabitur per vestibulum potenti vehicula aenean elementum sem. Velit himenaeos hendrerit varius senectus mauris class? Habitasse hendrerit gravida tellus, consectetur mattis posuere. Cras risus vivamus duis hac ac semper porta. Taciti ligula aliquet consectetur malesuada integer eu elementum quisque.`,
+        date: new Date(),
+    },
+    {
+        title: "Teszt közlemény",
+        content: `Lorem ipsum odor amet, consectetuer adipiscing elit. Etiam facilisis ullamcorper semper; maecenas facilisis viverra. Tempus nunc nulla class tincidunt suscipit parturient mollis. Nullam vestibulum enim nostra enim cubilia lacus malesuada. Aliquet sociosqu bibendum tristique rutrum integer. Maecenas tristique pulvinar magnis blandit mi arcu aenean suspendisse. Sapien per parturient, molestie suscipit curabitur erat dictumst. Magna est dui sociosqu facilisi himenaeos morbi habitasse. Hendrerit efficitur elementum pretium dis montes habitasse elit.
+
+Elit eget est orci at diam conubia. Magnis fermentum orci tellus magna ac nullam taciti feugiat. Vehicula aenean ligula aptent nunc laoreet. Sollicitudin varius pharetra mus mi mi, elit aenean. Fusce curabitur per vestibulum potenti vehicula aenean elementum sem. Velit himenaeos hendrerit varius senectus mauris class? Habitasse hendrerit gravida tellus, consectetur mattis posuere. Cras risus vivamus duis hac ac semper porta. Taciti ligula aliquet consectetur malesuada integer eu elementum quisque.`,
+        date: new Date('2024-04-10T18:30:41'),
+    }
+]
+
 async function seed() {
 
-    const instaPostsArray = await prisma.url.createMany({
+    const instagramPostsArray = await prisma.socialPost.createMany({
         data: instagramPosts.map(post => ({...post})),
     })
 
-    const postsArray = await prisma.url.createMany({
-        data: posts.map(post => ({...post})),
+    const tiktokPostsArray = await prisma.socialPost.createMany({
+        data: tiktokPosts.map(post => ({...post})),
+    })
+
+    const newsPostsArray = await prisma.newsPost.createMany({
+        data: newsPosts.map(post => ({...post})),
     })
 
     console.log('Seed data inserted successfully');

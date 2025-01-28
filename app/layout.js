@@ -23,7 +23,7 @@ export default function RootLayout({children}) {
                 <link rel="icon" href="/favicon.ico"/>
             </head>
             <body
-                className="kozos-nevezo text-foreground bg-background h-auto min-h-screen"
+                className="kozos-nevezo kanit-regular text-foreground bg-background h-auto min-h-screen"
             >
             <Navbar_/>
             <Providers>

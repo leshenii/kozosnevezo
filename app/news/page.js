@@ -1,34 +1,37 @@
 'use client'
 
 import {useEffect, useRef, useState} from "react";
-import {Button, Checkbox, CheckboxGroup} from "@heroui/react";
+import {Button, Card, CardBody, CardHeader, Checkbox, CheckboxGroup} from "@heroui/react";
 import {Skeleton} from "@heroui/skeleton";
 
 export default function NewsPage() {
 
     const [isLoading, setIsLoading] = useState(true);
-    const [urls, setUrls] = useState([])
+    const [posts, setPosts] = useState([])
     const [visibleCount, setVisibleCount] = useState(12);
     const loaderRef = useRef(null);
     const [selected, setSelected] = useState(["tiktok", "instagram", "kozlemenyek"]);
     const [isInvalid, setIsInvalid] = useState(false);
 
-    const fetchUrls = async () => {
-        await fetch('/api/ifttt-webhooks/tiktok', {
+    const fetchPosts = async () => {
+        await fetch('/api/posts', {
             method: 'GET'
         })
             .then(response => response.json())
-            .then(urls => {
-                setUrls(urls);
+            .then(postsLocale => {
+                setPosts(postsLocale)
                 setIsLoading(false)
-                console.log(urls);
             })
             .catch(error => console.error('Error fetching urls:', error));
     }
 
     useEffect(() => {
-        fetchUrls();
+        fetchPosts();
     }, []);
+
+    useEffect(() => {
+        console.log(posts)
+    }, [posts]);
 
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
@@ -48,18 +51,15 @@ export default function NewsPage() {
         };
     }, []);
 
-    useEffect(() => {
-        console.log(selected);
-    }, [selected]);
 
-    const filteredUrls = urls.filter(url => {
-        if (selected.includes('tiktok') && url.url.includes('www.tiktok.com')) {
+    const filteredUrls = posts.filter(post => {
+        if (selected.includes('tiktok') && post.url?.includes('www.tiktok.com')) {
             return true;
         }
-        if (selected.includes('instagram') && url.url.includes('www.instagram.com')) {
+        if (selected.includes('instagram') && post.url?.includes('www.instagram.com')) {
             return true;
         }
-        return false;
+        return selected.includes('kozlemenyek') && post.title;
     });
 
     return (
@@ -75,11 +75,12 @@ export default function NewsPage() {
                         onValueChange={(value) => {
                             setIsInvalid(value.length < 1);
                             setSelected(value);
+                            setVisibleCount(12);
                         }}
                         orientation="horizontal"
                     >
-                        <Checkbox value="tiktok">TikTok</Checkbox>
-                        <Checkbox value="instagram">Instagram</Checkbox>
+                        <Checkbox className="mr-1" value="tiktok">TikTok</Checkbox>
+                        <Checkbox className="mr-1" value="instagram">Instagram</Checkbox>
                         <Checkbox value="kozlemenyek">Közlemények</Checkbox>
                     </CheckboxGroup>
                 </div>
@@ -97,18 +98,29 @@ export default function NewsPage() {
                     <>
                         {[...Array(12)].map((_, index) => (
                             <Skeleton key={index} className="">
-                                <div className="h-[350px] w-[100%] rounded-lg bg-default-300"/>
+                                <div className="h-[450px] w-[100%] rounded-lg bg-default-300"/>
                             </Skeleton>
                         ))}
                     </>
                 ) : (
                     filteredUrls.slice(0, visibleCount).map((post, index) => (
                         <div key={index}>
-                            <iframe
-                                width="100%"
-                                height="450"
-                                src={post.url}
-                            />
+                            {post.url ? (
+                                <iframe
+                                    width="100%"
+                                    height="450"
+                                    src={post.url}
+                                />
+                            ) : (
+                                <Card className="max-h-[450px]" style={{ border: "3px solid #003399" }}>
+                                    <CardHeader >
+                                        <p className="kanit-semibold text-large">{post.title}</p>
+                                    </CardHeader>
+                                    <CardBody>
+                                        <pre className="kanit-regular text-wrap">{post.content}</pre>
+                                    </CardBody>
+                                </Card>
+                            )}
                         </div>
                     ))
                 )}

@@ -13,14 +13,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Url {
+model SocialPost {
   id   Int       @id @default(autoincrement())
   url  String
   date DateTime?
 }
 
 model NewsPost {
-  id      Int     @id @default(autoincrement())
+  id      Int      @id @default(autoincrement())
   title   String?
   content String?
+  date    DateTime
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  title       String?
+  country     String
+  location    String?
+  startDate   DateTime
+  endDate     DateTime
+  description String?
 }

@@ -17,7 +17,7 @@ export async function POST(request, res) {
     const formattedDate = parsedDate.toISOString();
 
     try {
-        const database_url = await prisma.url.create({
+        const database_socialpost = await prisma.socialPost.create({
             data: {
                 url: updatedUrl,
                 date: formattedDate

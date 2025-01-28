@@ -356,7 +356,7 @@ const instagramPosts = [
     },
 ]
 
-const newsPosts = [
+const sitePosts = [
     {
         title: "Felállt a Közös Nevező Egyesület saját weboldala!",
         content: `Lorem ipsum odor amet, consectetuer adipiscing elit. Etiam facilisis ullamcorper semper; maecenas facilisis viverra. Tempus nunc nulla class tincidunt suscipit parturient mollis. Nullam vestibulum enim nostra enim cubilia lacus malesuada. Aliquet sociosqu bibendum tristique rutrum integer. Maecenas tristique pulvinar magnis blandit mi arcu aenean suspendisse. Sapien per parturient, molestie suscipit curabitur erat dictumst. Magna est dui sociosqu facilisi himenaeos morbi habitasse. Hendrerit efficitur elementum pretium dis montes habitasse elit.
@@ -383,8 +383,8 @@ async function seed() {
         data: tiktokPosts.map(post => ({...post})),
     })
 
-    const newsPostsArray = await prisma.newsPost.createMany({
-        data: newsPosts.map(post => ({...post})),
+    const sitePostsArray = await prisma.sitePost.createMany({
+        data: sitePosts.map(post => ({...post})),
     })
 
     console.log('Seed data inserted successfully');

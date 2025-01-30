@@ -1,0 +1,31 @@
+module.exports = {
+    name: "gregorian_hu",
+    months: [
+        ["Január", "Jan"],
+        ["Február", "Feb"],
+        ["Március", "Már"],
+        ["Április", "Ápr"],
+        ["Május", "Máj"],
+        ["Június", "Jún"],
+        ["Július", "Júl"],
+        ["Augusztus", "Aug"],
+        ["Szeptember", "Szept"],
+        ["Október", "Okt"],
+        ["November", "Nov"],
+        ["December", "Dec"],
+    ],
+    weekDays: [
+        ["Szombat", "Szo"],
+        ["Vasárnap", "Vas"],
+        ["Hétfő", "Hét"],
+        ["Kedd", "Ked"],
+        ["Szerda", "Sze"],
+        ["Csütörtök", "Csü"],
+        ["Péntek", "Pén"],
+    ],
+    digits: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+    meridiems: [
+        ["DE", "de"],
+        ["DU", "du"],
+    ],
+};

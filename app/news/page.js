@@ -178,7 +178,7 @@ export default function NewsPage() {
                                         <p className="kanit-semibold text-large">{post.title}</p>
                                     </CardHeader>
                                     <CardBody>
-                                        <pre className="kanit-regular text-wrap">{post.content}</pre>
+                                        <pre className="kanit-regular text-justify text-wrap">{post.content}</pre>
                                     </CardBody>
                                 </Card>
                             )}

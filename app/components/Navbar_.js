@@ -5,6 +5,7 @@ import Link from "next/link";
 import {SignedOut, SignedIn, UserButton} from "@clerk/nextjs";
 import {useRouter} from 'next/navigation';
 import {useAuth} from "@clerk/nextjs";
+import { motion } from "motion/react"
 
 export const Logo = () => (
     <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 551.69 582.44">
@@ -98,24 +99,49 @@ export default function Navbar_() {
         <Navbar maxWidth="full" height="50px" shouldHideOnScroll className="py-3 bg-opacity-100">
             <NavbarBrand>
                 <Logo/>
-                <p style={{ cursor: 'pointer' }} onClick={() => router.push('/')} className='kanit-bold text-3xl pl-2'>KÖZÖS NEVEZŐ</p>
+                <motion.div
+                    whileHover={{scale: 1.08}}
+                    whileTap={{scale: 0.9, borderRadius: "100%"}}
+                    onClick={() => router.push('/')}
+                >
+                    <p style={{cursor: 'pointer'}}
+                       className='kanit-bold text-3xl pl-2'>KÖZÖS NEVEZŐ</p>
+                </motion.div>
             </NavbarBrand>
             <NavbarContent justify="center" className="gap-8">
                 <NavbarItem>
-                    <Link href="/news" className="kanit-semibold text-2xl">
-                        Hírek
-                    </Link>
+                    <motion.div
+                        whileHover={{scale: 1.2}}
+                        whileTap={{scale: 0.8, borderRadius: "100%"}}
+                        onClick={() => router.push('/news')}
+                    >
+                        <span className="kanit-semibold text-2xl" style={{cursor: 'pointer'}}>
+                            Hírek
+                        </span>
+                    </motion.div>
                 </NavbarItem>
                 <NavbarItem isActive>
-                    <Link href="/projects" className="kanit-semibold text-2xl">
-                        Projektek
-                    </Link>
+                    <motion.div
+                        whileHover={{scale: 1.2}}
+                        whileTap={{scale: 0.8, borderRadius: "100%"}}
+                        onClick={() => router.push('/projects')}
+                    >
+                        <span className="kanit-semibold text-2xl" style={{cursor: 'pointer'}}>
+                            Projektek
+                        </span>
+                    </motion.div>
                 </NavbarItem>
                 {(isLoaded && userId) && (
                     <NavbarItem>
-                        <Link href="/profile" className="kanit-semibold text-2xl">
+                        <motion.div
+                            whileHover={{scale: 1.2}}
+                            whileTap={{scale: 0.8, borderRadius: "100%"}}
+                            onClick={() => router.push('/profile')}
+                        >
+                        <span className="kanit-semibold text-2xl" style={{cursor: 'pointer'}}>
                             Profilom
-                        </Link>
+                        </span>
+                        </motion.div>
                     </NavbarItem>
                 )}
             </NavbarContent>

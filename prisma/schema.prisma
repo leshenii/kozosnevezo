@@ -14,9 +14,9 @@ datasource db {
 }
 
 model SocialPost {
-  id   Int       @id @default(autoincrement())
+  id   Int      @id @default(autoincrement())
   url  String
-  date DateTime?
+  date DateTime
 }
 
 model SitePost {
@@ -27,11 +27,34 @@ model SitePost {
 }
 
 model Project {
-  id          Int      @id @default(autoincrement())
-  title       String?
-  country     String
-  location    String?
-  startDate   DateTime
-  endDate     DateTime
-  description String?
+  id           Int                  @id @default(autoincrement())
+  type         String
+  title        String?
+  country      String
+  location     String?
+  startDate    DateTime
+  endDate      DateTime
+  description  String?
+  participants ProjectParticipant[]
+  teamLeader   User?                @relation("ProjectTeamLeader", fields: [leaderId], references: [id])
+  leaderId     Int?
+  infopack     String?
+  organization String?
+}
+
+model User {
+  id                   Int                  @id @default(autoincrement())
+  email                String               @unique
+  clerkId              String?              @unique
+  projectsParticipated ProjectParticipant[]
+  projectsLead         Project[]            @relation("ProjectTeamLeader")
+}
+
+model ProjectParticipant {
+  projectId Int
+  userId    Int
+  project   Project @relation(fields: [projectId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@id([projectId, userId])
 }

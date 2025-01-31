@@ -125,8 +125,10 @@ export default function NewsPage() {
                     )}
                 </ModalContent>
             </Modal>
-            <div className='flex flex-row items-center w-full px-6'>
-                <div className="w-2/6">
+            <div className='flex flex-col sm:flex-row items-center w-full px-6'>
+                <h1 className="sm:hidden mb-5 title w-2/6 text-center">Hírek</h1>
+                <div className="flex flex-row w-full sm:w-2/6 mb-3 sm:mb-0">
+                    <div className="w-4/6 sm:w-auto">
                     <CheckboxGroup
                         color="primary"
                         defaultValue={["tiktok", "instagram", "kozlemenyek"]}
@@ -144,17 +146,24 @@ export default function NewsPage() {
                         <Checkbox className="mr-1" value="instagram">Instagram</Checkbox>
                         <Checkbox value="kozlemenyek">Közlemények</Checkbox>
                     </CheckboxGroup>
+                    </div>
+                    <div className="sm:hidden text-right w-2/6 my-auto h-full">
+                        <Button color="primary" radius="full" variant="ghost"
+                                onPress={onOpen}>
+                            <p className='kanit-semibold text-large'>Új hírt közlök</p>
+                        </Button>
+                    </div>
                 </div>
-                <h1 className="m-5 title w-2/6 text-center">Hírek</h1>
+                <h1 className="hidden sm:block m-5 title w-2/6 text-center">Hírek</h1>
                 <div className="w-1/6"></div>
-                <div className="w-1/6 text-right">
+                <div className="hidden sm:block w-1/6 text-right">
                     <Button color="primary" radius="full" variant="ghost"
                             onPress={onOpen}>
                         <p className='kanit-semibold text-large'>Új hírt közlök</p>
                     </Button>
                 </div>
             </div>
-            <div className="grid grid-cols-4 w-11/12 gap-4 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 w-11/12 gap-4 mb-4">
                 {isFeedLoading ? (
                     <>
                         {[...Array(12)].map((_, index) => (

@@ -76,6 +76,7 @@ export default function ProjectsPage() {
                 currentDate={new DateObject()}
                 mapDays={mapDays}
                 className="mx-auto"
+                numberOfMonths={window.innerWidth < 640 ? 1 : 3}
             />
             }
         </div>

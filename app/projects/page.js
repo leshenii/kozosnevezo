@@ -10,6 +10,13 @@ export default function ProjectsPage() {
     const [projects, setProjects] = useState([])
     const [projectIntervals, setProjectIntervals ] = useState([])
     const [isLoading, setIsLoading] = useState(true);
+    const [numberOfMonths, setNumberOfMonths] = useState(3);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setNumberOfMonths(window.innerWidth < 640 ? 1 : 3);
+        }
+    }, []);
 
     const fetchProjects = async () => {
         await fetch('/api/projects', {
@@ -63,7 +70,7 @@ export default function ProjectsPage() {
 
     return (
         <div className="text-center">
-            <h1 className="m-5 title text-center">Projektek</h1>
+            <h1 className="mt-5 title text-center">Projektek</h1>
             {isLoading ? <Spinner color="primary" size="lg" className="pt-20"/> :
             <Calendar
                 value={projectIntervals}
@@ -75,7 +82,7 @@ export default function ProjectsPage() {
                 locale={gregorian_hu}
                 currentDate={new DateObject()}
                 mapDays={mapDays}
-                className="mx-auto"
+                className="mx-auto mt-14"
                 numberOfMonths={window.innerWidth < 640 ? 1 : 3}
             />
             }

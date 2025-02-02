@@ -52,7 +52,7 @@ export default function NewsPage() {
             if (entries[0].isIntersecting) {
                 setVisibleCount((prevCount) => prevCount + 12);
             }
-        }, { threshold: 1.0 });
+        }, {threshold: 1.0});
 
         if (loaderRef.current) {
             observer.observe(loaderRef.current);
@@ -98,17 +98,21 @@ export default function NewsPage() {
 
     return (
         <>
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl" isDismissable={false}>
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center" size="xl" isDismissable={false}>
                 <ModalContent>
                     {(onClose) => (
                         <>
                             <ModalHeader className="flex flex-col gap-1">
                                 <Input
-                                    label="Add meg a közlemény címét" variant="bordered" className="pr-4" isRequired color="primary" radius="full" value={postTitleValue} onValueChange={setPostTitleValue}
+                                    label="Add meg a közlemény címét" variant="bordered" className="pr-4" isRequired
+                                    color="primary" radius="full" value={postTitleValue}
+                                    onValueChange={setPostTitleValue}
                                 />
                             </ModalHeader>
                             <ModalBody>
-                                <Textarea color="primary" variant="bordered" radius="lg" placeholder="Mit szeretnél közölni?" minRows={7} maxRows={15} value={postContentValue} onValueChange={setPostContentValue}/>
+                                <Textarea color="primary" variant="bordered" radius="lg"
+                                          placeholder="Mit szeretnél közölni?" minRows={7} maxRows={15}
+                                          value={postContentValue} onValueChange={setPostContentValue}/>
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="danger" radius="full" variant="light" onPress={onClose}>
@@ -127,27 +131,27 @@ export default function NewsPage() {
             </Modal>
             <div className='flex flex-col sm:flex-row items-center w-full px-6'>
                 <h1 className="sm:hidden mb-5 title w-2/6 text-center">Hírek</h1>
-                <div className="flex flex-row w-full sm:w-2/6 mb-3 sm:mb-0">
-                    <div className="w-4/6 sm:w-auto">
-                    <CheckboxGroup
-                        color="primary"
-                        defaultValue={["tiktok", "instagram", "kozlemenyek"]}
-                        label="Milyen híreket szeretnél látni?"
-                        value={selectedPostTypes}
-                        isPostTypeSelectionInvalid={isPostTypeSelectionInvalid}
-                        onValueChange={(value) => {
-                            setIsPostTypeSelectionInvalid(value.length < 1);
-                            setSelectedPostTypes(value);
-                            setVisibleCount(12);
-                        }}
-                        orientation="horizontal"
-                    >
-                        <Checkbox className="mr-1" value="tiktok">TikTok</Checkbox>
-                        <Checkbox className="mr-1" value="instagram">Instagram</Checkbox>
-                        <Checkbox value="kozlemenyek">Közlemények</Checkbox>
-                    </CheckboxGroup>
+                <div className="flex flex-col sm:flex-row w-full sm:w-2/6 mb-3 sm:mb-0">
+                    <div className="w-auto sm:w-auto">
+                        <CheckboxGroup
+                            color="primary"
+                            defaultValue={["tiktok", "instagram", "kozlemenyek"]}
+                            label="Milyen híreket szeretnél látni?"
+                            value={selectedPostTypes}
+                            isPostTypeSelectionInvalid={isPostTypeSelectionInvalid}
+                            onValueChange={(value) => {
+                                setIsPostTypeSelectionInvalid(value.length < 1);
+                                setSelectedPostTypes(value);
+                                setVisibleCount(12);
+                            }}
+                            orientation="horizontal"
+                        >
+                            <Checkbox className="mr-1" value="tiktok">TikTok</Checkbox>
+                            <Checkbox className="mr-1" value="instagram">Instagram</Checkbox>
+                            <Checkbox value="kozlemenyek">Közlemények</Checkbox>
+                        </CheckboxGroup>
                     </div>
-                    <div className="sm:hidden text-right w-2/6 my-auto h-full">
+                    <div className="sm:hidden my-3 sm:my-auto h-full flex justify-end">
                         <Button color="primary" radius="full" variant="ghost"
                                 onPress={onOpen}>
                             <p className='kanit-semibold text-large'>Új hírt közlök</p>
@@ -163,12 +167,12 @@ export default function NewsPage() {
                     </Button>
                 </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 w-11/12 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 w-11/12 gap-4 mb-4">
                 {isFeedLoading ? (
                     <>
                         {[...Array(12)].map((_, index) => (
                             <Skeleton key={index} className="">
-                                <div className="h-[450px] w-[100%] rounded-lg bg-default-300"/>
+                                <div className="h-[550px] sm:h-[450px] rounded-lg bg-default-300"/>
                             </Skeleton>
                         ))}
                     </>
@@ -178,12 +182,12 @@ export default function NewsPage() {
                             {post.url ? (
                                 <iframe
                                     width="100%"
-                                    height="450"
                                     src={post.url}
+                                    className="h-[550px] sm:h-[450px]"
                                 />
                             ) : (
-                                <Card className="h-[450px]" style={{ border: "3px solid #003399" }}>
-                                    <CardHeader >
+                                <Card className="h-[550px] sm:h-[450px]" style={{border: "3px solid #003399"}}>
+                                    <CardHeader>
                                         <p className="kanit-semibold text-large">{post.title}</p>
                                     </CardHeader>
                                     <CardBody>

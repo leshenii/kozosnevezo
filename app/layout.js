@@ -3,7 +3,7 @@ import Navbar_ from "@/app/components/Navbar_";
 import {ClerkProvider} from "@clerk/nextjs";
 import { huHU } from '@clerk/localizations'
 import "./globals.css";
-
+import { registerLicense } from '@syncfusion/ej2-base';
 
 export const metadata = {
     title: "Közös Nevező Egyesület",
@@ -15,7 +15,10 @@ export const metadata = {
     },
 };
 
+registerLicense('Ngo9BigBOggjHTQxAR8/V1NMaF1cXmhLYVJ2WmFZfVtgd19FZ1ZRQWYuP1ZhSXxWdkdjWn9dc3NVQ2dZUkU=');
+
 export default function RootLayout({children}) {
+
     return (
         <ClerkProvider localization={huHU}>
             <html lang="en">

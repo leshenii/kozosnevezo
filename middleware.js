@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import {NextResponse, NextRequest} from "next/server";
 
 const isProtectedRoute = createRouteMatcher(['/profile(.*)', ])
 
@@ -6,11 +7,14 @@ export default clerkMiddleware(async (auth, req, res) => {
     if (isProtectedRoute(req)) {
         await auth.protect();
     }
+    if (req.nextUrl.pathname.includes('project') && req.nextUrl.searchParams.get('view') === null) {
+        return NextResponse.redirect(req.url + '?view=calendar');
+    }
+    return NextResponse.next();
 });
 
+
+
 export const config = {
-    // Protects all routes, including api/trpc.
-    // See https://clerk.com/docs/references/nextjs/auth-middleware
-    // for more information about configuring your Middleware
     matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };

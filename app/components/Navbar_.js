@@ -13,7 +13,7 @@ export default function Navbar_() {
     const {isLoaded, userId} = useAuth()
 
     return (
-        <Navbar maxWidth="full" shouldHideOnScroll className="!h-[110px] sm:!h-[64px] pb-6 sm:py-3 bg-opacity-100">
+        <Navbar maxWidth="full" shouldHideOnScroll className="!h-[150px] sm:!h-[64px] pb-16 sm:py-3 bg-opacity-100">
             <NavbarBrand className="hidden sm:flex">
                 <Logo/>
                 <motion.div
@@ -37,53 +37,57 @@ export default function Navbar_() {
                            className='kanit-bold text-3xl pl-2'>KÖZÖS NEVEZŐ</p>
                     </motion.div>
                 </NavbarContent>
-                <NavbarContent justify="center" className="gap-8" >
-                    <NavbarItem>
-                        <motion.div
-                            whileHover={{scale: 1.2}}
-                            whileTap={{scale: 0.8, borderRadius: "100%"}}
-                            onClick={() => router.push('/news')}
-                        >
-                        <span className="kanit-semibold text-2xl" style={{cursor: 'pointer'}}>
-                            Hírek
-                        </span>
-                        </motion.div>
-                    </NavbarItem>
-                    <NavbarItem isActive>
-                        <motion.div
-                            whileHover={{scale: 1.2}}
-                            whileTap={{scale: 0.8, borderRadius: "100%"}}
-                            onClick={() => router.push('/projects')}
-                        >
-                        <span className="kanit-semibold text-2xl" style={{cursor: 'pointer'}}>
-                            Projektek
-                        </span>
-                        </motion.div>
-                    </NavbarItem>
-                    <NavbarItem>
-                        <motion.div
-                            whileHover={{scale: 1.2}}
-                            whileTap={{scale: 0.8, borderRadius: "100%"}}
-                            onClick={() => router.push('/about')}
-                        >
-                        <span className="kanit-semibold text-2xl" style={{cursor: 'pointer'}}>
-                            Rólunk
-                        </span>
-                        </motion.div>
-                    </NavbarItem>
-                    {(isLoaded && userId) && (
+                <NavbarContent justify="center" className="gap-2 sm:gap-8 flex flex-col sm:flex-row">
+                    <div className="flex flex-row gap-8">
                         <NavbarItem>
                             <motion.div
                                 whileHover={{scale: 1.2}}
                                 whileTap={{scale: 0.8, borderRadius: "100%"}}
-                                onClick={() => router.push('/profile')}
+                                onClick={() => router.push('/news')}
+                            >
+                            <span className="kanit-semibold text-2xl" style={{cursor: 'pointer'}}>
+                                Hírek
+                            </span>
+                            </motion.div>
+                        </NavbarItem>
+                        <NavbarItem>
+                            <motion.div
+                                whileHover={{scale: 1.2}}
+                                whileTap={{scale: 0.8, borderRadius: "100%"}}
+                                onClick={() => router.push('/projects')}
+                            >
+                            <span className="kanit-semibold text-2xl" style={{cursor: 'pointer'}}>
+                                Projektek
+                            </span>
+                            </motion.div>
+                        </NavbarItem>
+                    </div>
+                    <div className="flex flex-row gap-8">
+                        <NavbarItem>
+                            <motion.div
+                                whileHover={{scale: 1.2}}
+                                whileTap={{scale: 0.8, borderRadius: "100%"}}
+                                onClick={() => router.push('/about')}
                             >
                         <span className="kanit-semibold text-2xl" style={{cursor: 'pointer'}}>
-                            Profilom
+                            Rólunk
                         </span>
                             </motion.div>
                         </NavbarItem>
-                    )}
+                        {(isLoaded && userId) && (
+                            <NavbarItem>
+                                <motion.div
+                                    whileHover={{scale: 1.2}}
+                                    whileTap={{scale: 0.8, borderRadius: "100%"}}
+                                    onClick={() => router.push('/profile')}
+                                >
+                        <span className="kanit-semibold text-2xl" style={{cursor: 'pointer'}}>
+                            Profilom
+                        </span>
+                                </motion.div>
+                            </NavbarItem>
+                        )}
+                    </div>
                 </NavbarContent>
             </div>
             <NavbarContent justify="end" className="hidden sm:flex">

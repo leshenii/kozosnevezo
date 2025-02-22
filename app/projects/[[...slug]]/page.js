@@ -59,10 +59,14 @@ export default function ProjectsPage() {
     const [filteredProjects, setFilteredProjects] = useState([])
 
     const shapeSelected = (args) => {
-        const country = args.data.name;
-        setSelectedCountry(countries.getAlpha2Code(country, "en"));
-        setSelectedView('filter');
-        router.push('/projects?view=filter&country=' + countries.getAlpha2Code(country, "en"), { shallow: true });
+
+        if (args.data) {
+            const country = args.data.name;
+            setSelectedCountry(countries.getAlpha2Code(country, "en"));
+            setSelectedView('filter');
+            router.push('/projects?view=filter&country=' + countries.getAlpha2Code(country, "en"), { shallow: true });
+        }
+
         //redirect('/projects?view=filter&country=' + countries.getAlpha2Code(country, "en"));
     };
 

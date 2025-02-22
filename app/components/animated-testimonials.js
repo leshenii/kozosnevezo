@@ -32,7 +32,7 @@ export const AnimatedTestimonials = ({
     const rotationValues = [7, -5, 3, -8, 2];
 
     return (
-        <div className="max-w-sm md:max-w-5xl mx-auto sm:mr-[5%] antialiased font-sans pb-20 sm:px-4 md:px-8 lg:px-12 py-10">
+        <div className="max-w-sm md:max-w-5xl mx-auto sm:mr-[5%] antialiased font-sans pb-20 px-4 md:px-8 lg:px-12 py-10">
             <div className="relative grid grid-cols-1 md:grid-cols-2 gap-10">
 
                 <div className="relative h-80 w-80 justify-self-center sm:justify-self-end">
@@ -52,7 +52,7 @@ export const AnimatedTestimonials = ({
                                     z: isActive(index) ? 0 : -100,
                                     rotate: isActive(index) ? 0 : rotationValues[index % rotationValues.length],
                                     zIndex: isActive(index)
-                                        ? 999
+                                        ? 10
                                         : testimonials.length + 2 - index,
                                     y: isActive(index) ? [0, -80, 0] : 0,
                                 }}

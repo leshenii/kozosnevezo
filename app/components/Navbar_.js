@@ -13,7 +13,7 @@ export default function Navbar_() {
     const {isLoaded, userId} = useAuth()
 
     return (
-        <Navbar maxWidth="full" shouldHideOnScroll className="!h-[150px] sm:!h-[64px] pb-16 sm:py-3 bg-opacity-100">
+        <Navbar maxWidth="full" shouldHideOnScroll className="!h-[150px] sm:!h-[64px] pb-16 sm:py-3 bg-opacity-100 z-20">
             <NavbarBrand className="hidden sm:flex">
                 <Logo/>
                 <motion.div

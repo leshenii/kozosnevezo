@@ -1,9 +1,11 @@
-import {Providers} from "@/app/components/Providers";
+import {Providers} from "app/components/Providers";
 import Navbar_ from "@/app/components/Navbar_";
 import {ClerkProvider} from "@clerk/nextjs";
-import { huHU } from '@clerk/localizations'
+import {huHU} from '@clerk/localizations'
 import "./globals.css";
-import { registerLicense } from '@syncfusion/ej2-base';
+import {registerLicense} from '@syncfusion/ej2-base';
+import {Button} from "@heroui/react";
+import FloatingButton from "@/app/components/FloatingButton";
 
 export const metadata = {
     title: "Közös Nevező Egyesület",
@@ -28,9 +30,11 @@ export default function RootLayout({children}) {
             <body
                 className="kozos-nevezo kanit-regular text-foreground bg-background h-auto min-h-screen"
             >
+
             <Navbar_/>
             <Providers>
                 {children}
+                <FloatingButton/>
             </Providers>
             </body>
             </html>

@@ -2,12 +2,27 @@
 
 import {useEffect, useState} from "react";
 import {DateObject, Calendar} from "react-multi-date-picker";
-import {Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spinner, Tooltip} from "@heroui/react";
+import {
+    Autocomplete, AutocompleteItem,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+    Radio,
+    RadioGroup,
+    Spinner,
+    Tooltip,
+    Avatar, Card, CardBody
+} from "@heroui/react";
 import gregorian_hu from "../../lib/gregorian_hu";
-import {MapsComponent, Inject, LayersDirective, LayerDirective, MapsTooltip} from '@syncfusion/ej2-react-maps';
+import {MapsComponent, Inject, LayersDirective, LayerDirective, MapsTooltip, Selection, Polygon, Highlight} from '@syncfusion/ej2-react-maps';
 import * as data from '../../lib/tooltip-datasource.json';
 import * as worldMap from '../../lib/world-map.json';
 import {useRouter, usePathname, redirect, useSearchParams} from 'next/navigation'
+import {snakeCase} from "snake-case";
+import removeAccents from 'remove-accents';
+import countries from 'i18n-iso-countries';
+countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
+countries.registerLocale(require("i18n-iso-countries/langs/hu.json"));
 
 let datasource = data;
 const SAMPLE_CSS = `
@@ -29,40 +44,57 @@ export default function ProjectsPage() {
     };
 
     const searchParams = useSearchParams()
+
     const [projects, setProjects] = useState([])
     const [projectIntervals, setProjectIntervals] = useState([])
     const [isLoading, setIsLoading] = useState(true);
     const [numberOfMonths, setNumberOfMonths] = useState(3);
     const [selectedView, setSelectedView] = useState(searchParams.get('view'));
+    const [countriesLocal, setCountriesLocal] = useState([]);
+    const [organizations, setOrganizations] = useState([]);
+    const [types, setTypes] = useState([]);
+    const [selectedCountry, setSelectedCountry] = useState(searchParams.get('country'));
+    const [selectedOrganization, setSelectedOrganization] = useState(null);
+    const [selectedType, setSelectedType] = useState(null);
+    const [filteredProjects, setFilteredProjects] = useState([])
 
+    const shapeSelected = (args) => {
+        const country = args.data.name;
+        setSelectedCountry(countries.getAlpha2Code(country, "en"));
+        setSelectedView('filter');
+        //redirect('/projects?view=filter&country=' + countries.getAlpha2Code(country, "en"));
+    };
 
-    let template = '<div id="tooltemplate" class="bg-white rounded-xl p-2"><h1 class="kanit-bold">${country}</h1><h1 class="kanit-semibold">${projects} projekt</h1></div>';
-    let shapeSetting = {
+    const shapeSetting = {
         fill: 'lightgrey',
         colorMapping: [
-            {value: '1', color: '#cce5ff'},
-            {value: '2', color: '#b3daff'},
-            {value: '3', color: '#99ccff'},
-            {value: '4', color: '#80bfff'},
-            {value: '5', color: '#66b2ff'},
-            {value: '6', color: '#4da6ff'},
-            {value: '7', color: '#3399ff'},
-            {value: '8', color: '#1a8cff'},
-            {value: '9', color: '#007fff'},
-            {value: '10', color: '#0073e6'},
-            {value: '11', color: '#0066cc'},
-            {value: '12', color: '#0059b3'},
-            {value: '13', color: '#004d99'},
-            {value: '14', color: '#004080'},
-            {value: '15', color: '#003366'},
-            {value: '16', color: '#00264d'},
-            {value: '17', color: '#001a33'},
-            {value: '18', color: '#000d1a'},
-            {value: '19', color: '#000000'},
-            {value: '20', color: '#000000'},
+            { value: '1', color: '#cce5ff' },
+            { value: '2', color: '#b3daff' },
+            { value: '3', color: '#99ccff' },
+            { value: '4', color: '#80bfff' },
+            { value: '5', color: '#66b2ff' },
+            { value: '6', color: '#4da6ff' },
+            { value: '7', color: '#3399ff' },
+            { value: '8', color: '#1a8cff' },
+            { value: '9', color: '#007fff' },
+            { value: '10', color: '#0073e6' },
+            { value: '11', color: '#0066cc' },
+            { value: '12', color: '#0059b3' },
+            { value: '13', color: '#004d99' },
+            { value: '14', color: '#004080' },
+            { value: '15', color: '#003366' },
+            { value: '16', color: '#00264d' },
+            { value: '17', color: '#001a33' },
+            { value: '18', color: '#000d1a' },
+            { value: '19', color: '#000000' },
+            { value: '20', color: '#000000' },
         ],
         colorValuePath: 'projects',
+        onClick: shapeSelected
     };
+
+    let template = '<div id="tooltemplate" class="bg-white rounded-xl p-2"><h1 class="kanit-bold">${country}</h1><h1 class="kanit-semibold">${projects} projekt</h1></div>';
+
     const onMapsLoad = () => {
         let maps = document.getElementById('maps');
         maps.setAttribute('title', '');
@@ -102,6 +134,18 @@ export default function ProjectsPage() {
                     })
                 ]);
                 setProjectIntervals(intervals)
+                setCountriesLocal([...new Set(projects.map(project => project.country))].map(country => ({
+                    label: country,
+                    key: countries.getAlpha2Code(country, "hu")
+                })))
+                setOrganizations([...new Set(projects.map(project => project.organization).filter(Boolean))].map(organization => ({
+                    label: organization,
+                    key: snakeCase(removeAccents(organization))
+                })));
+                setTypes([...new Set(projects.map(project => project.type))].map(type => ({
+                    label: type,
+                    key: snakeCase(removeAccents(type))
+                })))
                 setIsLoading(false)
             })
             .catch(error => {
@@ -113,7 +157,6 @@ export default function ProjectsPage() {
     useEffect(() => {
         fetchProjects()
     }, []);
-
 
     const getProjectTitles = (date) => {
         const normalizeDate = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -156,6 +199,31 @@ export default function ProjectsPage() {
         redirect('/projects?view=' + value)
     }
 
+    useEffect(() => {
+        console.log(selectedCountry)
+        router.push('/projects?view=filter&country=' + selectedCountry, { shallow: true });
+    }, [selectedCountry]);
+
+    const filterProjects = () => {
+        let filtered = projects;
+        if (selectedCountry) {
+            filtered = filtered.filter(project => countries.getAlpha2Code(project.country, "hu") === selectedCountry);
+        }
+        if (selectedOrganization) {
+            filtered = filtered.filter(project =>
+                project.organization && snakeCase(removeAccents(project.organization)) === selectedOrganization
+            );
+        }
+        if (selectedType) {
+            filtered = filtered.filter(project => snakeCase(removeAccents(project.type)) === selectedType);
+        }
+        setFilteredProjects(filtered);
+    }
+
+    useEffect(() => {
+        filterProjects();
+    }, [projects, selectedCountry, selectedOrganization, selectedType]);
+
     return (
         <div className="">
             <h1 className="mt-5 title text-center">Projektek</h1>
@@ -187,7 +255,8 @@ export default function ProjectsPage() {
                     )}
                     {selectedView === "map" && (
                         <div className="w-full">
-                            <MapsComponent id="maps" tooltipRender={tooltipRender} loaded={onMapsLoad} load={load} background='#F2F2F2'
+                            <MapsComponent id="maps" tooltipRender={tooltipRender} loaded={onMapsLoad} load={load} itemSelection={shapeSelected}
+                                           background='#F2F2F2'
                                            zoomSettings={{enable: false}} height="700px" width="600px" mapsArea={{
                                 background: '#F2F2F2',
                                 border: {
@@ -195,21 +264,89 @@ export default function ProjectsPage() {
                                     color: '#F2F2F2'
                                 }
                             }}>
-                                <Inject services={[MapsTooltip]}/>
+                                <Inject services={[MapsTooltip, Selection]} />
                                 <LayersDirective>
                                     <LayerDirective shapeData={filteredGeoJson} shapePropertyPath='name'
                                                     shapeDataPath='name' dataSource={datasource} tooltipSettings={{
                                         visible: true,
                                         valuePath: 'name',
                                         template: template
-                                    }} shapeSettings={shapeSetting}/>
+                                    }} shapeSettings={shapeSetting} selectionSettings={ {
+                                        enable: true,
+                                        fill: 'black',
+                                    } }/>
                                 </LayersDirective>
                             </MapsComponent>
                         </div>
                     )}
                     {selectedView === "filter" && (
-                        <div id="filter">
-                            {/* Add your filter component or content here */}
+                        <div className="flex flex-col gap-4">
+                            <div className="flex flex-col sm:flex-row gap-4" id="filter">
+                                <Autocomplete
+                                    className="max-w-xs"
+                                    defaultItems={countriesLocal}
+                                    label="Ország"
+                                    placeholder="Keress ország szerint"
+                                    color="primary"
+                                    variant="bordered"
+                                    defaultSelectedKey={selectedCountry}
+                                    onSelectionChange={(selected) => setSelectedCountry(selected)}
+                                >
+                                    {(country) => <AutocompleteItem
+                                        key={country.key}>{country.label}</AutocompleteItem>}
+                                </Autocomplete>
+                                <Autocomplete
+                                    className="max-w-xs"
+                                    defaultItems={types}
+                                    label="Fajták"
+                                    placeholder="Keress projekt fajta szerint"
+                                    color="primary"
+                                    variant="bordered"
+                                    onSelectionChange={(selected) => setSelectedType(selected)}
+                                >
+                                    {(type) => <AutocompleteItem key={type.key}>{type.label}</AutocompleteItem>}
+                                </Autocomplete>
+                                <Autocomplete
+                                    className="max-w-xs"
+                                    defaultItems={organizations}
+                                    label="Egyesület"
+                                    placeholder="Keress egyesület szerint"
+                                    color="primary"
+                                    variant="bordered"
+                                    onSelectionChange={(selected) => setSelectedOrganization(selected)}
+                                >
+                                    {(organization) => <AutocompleteItem
+                                        key={organization.key}>{organization.label}</AutocompleteItem>}
+                                </Autocomplete>
+                            </div>
+                            <div className="flex flex-col gap-3 mb-14">
+                                {filteredProjects.map(project => (
+                                    <Card key={project.id} isPressable>
+                                        <CardBody>
+                                            <div className="flex flex-row">
+                                                <div className="flex flex-col w-1/2">
+                                                    <h2 className="kanit-bold text-xl">{project.title}</h2>
+                                                    <p className="text-gray-700">{project.type}</p>
+                                                    <p className="text-blue-900 text-sm" >Részletek megtekintéséhez kattints!</p>
+                                                </div>
+                                                <div className="flex flex-col items-end w-1/2">
+                                                    <p>{new Date(project.startDate).toLocaleDateString('hu-HU', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric'
+                                                    })} - {new Date(project.endDate).toLocaleDateString('hu-HU', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric'
+                                                    })}</p>
+                                                    <p>{project.country}</p>
+                                                    <p>{project.organization}</p>
+                                                </div>
+                                            </div>
+                                        </CardBody>
+                                    </Card>
+                                ))}
+                            </div>
                         </div>
                     )}
                 </>

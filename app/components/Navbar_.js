@@ -60,6 +60,17 @@ export default function Navbar_() {
                         </span>
                         </motion.div>
                     </NavbarItem>
+                    <NavbarItem>
+                        <motion.div
+                            whileHover={{scale: 1.2}}
+                            whileTap={{scale: 0.8, borderRadius: "100%"}}
+                            onClick={() => router.push('/about')}
+                        >
+                        <span className="kanit-semibold text-2xl" style={{cursor: 'pointer'}}>
+                            Rólunk
+                        </span>
+                        </motion.div>
+                    </NavbarItem>
                     {(isLoaded && userId) && (
                         <NavbarItem>
                             <motion.div

@@ -8,9 +8,16 @@ module.exports = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+  	extend: {
+  		borderRadius: {
+  			lg: 'var(--radius)',
+  			md: 'calc(var(--radius) - 2px)',
+  			sm: 'calc(var(--radius) - 4px)'
+  		},
+  		colors: {}
+  	}
   },
-  darkMode: "class",
+  darkMode: ["class", "class"],
   plugins: [heroui({
     themes: {
       "kozos-nevezo": {
@@ -63,5 +70,7 @@ module.exports = {
         },
       },
     },
-  })],
+  }),
+      require("tailwindcss-animate")
+],
 };

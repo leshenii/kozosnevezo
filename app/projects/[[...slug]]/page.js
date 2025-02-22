@@ -49,13 +49,13 @@ export default function ProjectsPage() {
     const [projectIntervals, setProjectIntervals] = useState([])
     const [isLoading, setIsLoading] = useState(true);
     const [numberOfMonths, setNumberOfMonths] = useState(3);
-    const [selectedView, setSelectedView] = useState(searchParams.get('view'));
+    const [selectedView, setSelectedView] = useState(searchParams.get('view') || 'calendar');
     const [countriesLocal, setCountriesLocal] = useState([]);
     const [organizations, setOrganizations] = useState([]);
     const [types, setTypes] = useState([]);
-    const [selectedCountry, setSelectedCountry] = useState(searchParams.get('country'));
-    const [selectedOrganization, setSelectedOrganization] = useState(null);
-    const [selectedType, setSelectedType] = useState(null);
+    const [selectedCountry, setSelectedCountry] = useState(searchParams.get('country') === 'null' ? null : searchParams.get('country'));
+    const [selectedOrganization, setSelectedOrganization] = useState(searchParams.get('organization') === 'null' ? null : searchParams.get('organization'));
+    const [selectedType, setSelectedType] = useState(searchParams.get('type') === 'null' ? null : searchParams.get('type'));
     const [filteredProjects, setFilteredProjects] = useState([])
 
     const shapeSelected = (args) => {
@@ -171,10 +171,6 @@ export default function ProjectsPage() {
             .map(project => project.title);
     }
 
-    useEffect(() => {
-        console.log(countriesLocal)
-    }, [countriesLocal]);
-
     const mapDays = ({date, today}) => {
         const projectTitles = getProjectTitles(date.toDate());
         return {
@@ -204,9 +200,8 @@ export default function ProjectsPage() {
     }
 
     useEffect(() => {
-        console.log(selectedCountry)
-        router.push('/projects?view=filter&country=' + selectedCountry, { shallow: true });
-    }, [selectedCountry]);
+        router.push('/projects?view=filter&country=' + selectedCountry + '&type=' + selectedType + '&organization=' + selectedOrganization, { shallow: true });
+    }, [selectedCountry, selectedOrganization, selectedType]);
 
     const filterProjects = () => {
         let filtered = projects;
@@ -292,7 +287,7 @@ export default function ProjectsPage() {
                                     placeholder="Keress ország szerint"
                                     color="primary"
                                     variant="bordered"
-                                    defaultSelectedKey={selectedCountry}
+                                    defaultSelectedKey={selectedCountry || null}
                                     onSelectionChange={(selected) => setSelectedCountry(selected)}
                                     fullWidth
                                 >
@@ -308,6 +303,7 @@ export default function ProjectsPage() {
                                     placeholder="Keress projekt fajta szerint"
                                     color="primary"
                                     variant="bordered"
+                                    defaultSelectedKey={selectedType || null}
                                     onSelectionChange={(selected) => setSelectedType(selected)}
                                     fullWidth
                                 >
@@ -319,6 +315,7 @@ export default function ProjectsPage() {
                                     placeholder="Keress egyesület szerint"
                                     color="primary"
                                     variant="bordered"
+                                    defaultSelectedKey={selectedOrganization || null}
                                     onSelectionChange={(selected) => setSelectedOrganization(selected)}
                                     fullWidth
                                 >
@@ -331,15 +328,15 @@ export default function ProjectsPage() {
                                     <Card key={project.id} isPressable>
                                         <CardBody>
                                             <div className="flex flex-row">
-                                                <div className="flex flex-col w-1/2">
+                                                <div className="flex flex-col w-3/5 sm:w-1/2">
                                                     <h2 className="kanit-bold text-xl">{project.title}</h2>
                                                     <p className="text-gray-700">{project.type}</p>
                                                     <p className="text-blue-900 text-sm" >Részletek megtekintéséhez kattints!</p>
                                                 </div>
-                                                <div className="flex flex-col items-end w-1/2">
+                                                <div className="flex flex-col items-end text-end w-2/5 sm:w-1/2">
                                                     <p>{new Date(project.startDate).toLocaleDateString('hu-HU', {
                                                         year: 'numeric',
-                                                        month: 'long',
+                                                        month: 'short',
                                                         day: 'numeric'
                                                     })} - {new Date(project.endDate).toLocaleDateString('hu-HU', {
                                                         year: 'numeric',

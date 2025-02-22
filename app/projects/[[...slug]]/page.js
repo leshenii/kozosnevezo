@@ -14,7 +14,7 @@ import {
     Avatar, Card, CardBody
 } from "@heroui/react";
 import gregorian_hu from "../../lib/gregorian_hu";
-import {MapsComponent, Inject, LayersDirective, LayerDirective, MapsTooltip, Selection, Polygon, Highlight} from '@syncfusion/ej2-react-maps';
+import {MapsComponent, Inject, LayersDirective, LayerDirective, MapsTooltip, Selection } from '@syncfusion/ej2-react-maps';
 import * as data from '../../lib/tooltip-datasource.json';
 import * as worldMap from '../../lib/world-map.json';
 import {useRouter, usePathname, redirect, useSearchParams} from 'next/navigation'
@@ -171,6 +171,10 @@ export default function ProjectsPage() {
             .map(project => project.title);
     }
 
+    useEffect(() => {
+        console.log(countriesLocal)
+    }, [countriesLocal]);
+
     const mapDays = ({date, today}) => {
         const projectTitles = getProjectTitles(date.toDate());
         return {
@@ -225,7 +229,7 @@ export default function ProjectsPage() {
     }, [projects, selectedCountry, selectedOrganization, selectedType]);
 
     return (
-        <div className="">
+        <div className="mx-5">
             <h1 className="mt-5 title text-center">Projektek</h1>
             {isLoading ? <div className="text-center">
                     <Spinner color="primary" size="lg" className="pt-20"/>
@@ -281,9 +285,8 @@ export default function ProjectsPage() {
                     )}
                     {selectedView === "filter" && (
                         <div className="flex flex-col gap-4">
-                            <div className="flex flex-col sm:flex-row gap-4" id="filter">
+                            <div className="flex flex-col sm:flex-row gap-4 items-center" id="filter">
                                 <Autocomplete
-                                    className="max-w-xs"
                                     defaultItems={countriesLocal}
                                     label="Ország"
                                     placeholder="Keress ország szerint"
@@ -291,29 +294,33 @@ export default function ProjectsPage() {
                                     variant="bordered"
                                     defaultSelectedKey={selectedCountry}
                                     onSelectionChange={(selected) => setSelectedCountry(selected)}
+                                    fullWidth
                                 >
-                                    {(country) => <AutocompleteItem
-                                        key={country.key}>{country.label}</AutocompleteItem>}
+                                    {(country) => <AutocompleteItem key={country.key} startContent={
+                                        <Avatar alt="flag" className="w-6 h-6" src={`https://flagcdn.com/${snakeCase(country.key)}.svg`} />
+                                    }>
+                                        {country.label}
+                                    </AutocompleteItem>}
                                 </Autocomplete>
                                 <Autocomplete
-                                    className="max-w-xs"
                                     defaultItems={types}
                                     label="Fajták"
                                     placeholder="Keress projekt fajta szerint"
                                     color="primary"
                                     variant="bordered"
                                     onSelectionChange={(selected) => setSelectedType(selected)}
+                                    fullWidth
                                 >
                                     {(type) => <AutocompleteItem key={type.key}>{type.label}</AutocompleteItem>}
                                 </Autocomplete>
                                 <Autocomplete
-                                    className="max-w-xs"
                                     defaultItems={organizations}
                                     label="Egyesület"
                                     placeholder="Keress egyesület szerint"
                                     color="primary"
                                     variant="bordered"
                                     onSelectionChange={(selected) => setSelectedOrganization(selected)}
+                                    fullWidth
                                 >
                                     {(organization) => <AutocompleteItem
                                         key={organization.key}>{organization.label}</AutocompleteItem>}
@@ -339,8 +346,13 @@ export default function ProjectsPage() {
                                                         month: 'long',
                                                         day: 'numeric'
                                                     })}</p>
-                                                    <p>{project.country}</p>
+                                                    <div className="flex flex-row gap-2">
+                                                        <p>{project.country}</p>
+                                                        <Avatar alt="flag" className="w-6 h-6"
+                                                                src={`https://flagcdn.com/${snakeCase(countries.getAlpha2Code(project.country, 'hu'))}.svg`}/>
+                                                    </div>
                                                     <p>{project.organization}</p>
+
                                                 </div>
                                             </div>
                                         </CardBody>

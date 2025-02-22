@@ -17,7 +17,7 @@ import gregorian_hu from "../../lib/gregorian_hu";
 import {MapsComponent, Inject, LayersDirective, LayerDirective, MapsTooltip, Selection } from '@syncfusion/ej2-react-maps';
 import * as data from '../../lib/tooltip-datasource.json';
 import * as worldMap from '../../lib/world-map.json';
-import {useRouter, usePathname, redirect, useSearchParams} from 'next/navigation'
+import {useRouter, redirect, useSearchParams} from 'next/navigation'
 import {snakeCase} from "snake-case";
 import removeAccents from 'remove-accents';
 import countries from 'i18n-iso-countries';
@@ -62,6 +62,7 @@ export default function ProjectsPage() {
         const country = args.data.name;
         setSelectedCountry(countries.getAlpha2Code(country, "en"));
         setSelectedView('filter');
+        router.push('/projects?view=filter&country=' + countries.getAlpha2Code(country, "en"), { shallow: true });
         //redirect('/projects?view=filter&country=' + countries.getAlpha2Code(country, "en"));
     };
 
@@ -200,8 +201,10 @@ export default function ProjectsPage() {
     }
 
     useEffect(() => {
-        router.push('/projects?view=filter&country=' + selectedCountry + '&type=' + selectedType + '&organization=' + selectedOrganization, { shallow: true });
-    }, [selectedCountry, selectedOrganization, selectedType]);
+        if (searchParams.get('view') === 'filter') {
+            router.push('/projects?view=filter&country=' + selectedCountry + '&type=' + selectedType + '&organization=' + selectedOrganization, { shallow: true });
+        }
+    }, [projects, selectedCountry, selectedOrganization, selectedType]);
 
     const filterProjects = () => {
         let filtered = projects;
@@ -253,10 +256,10 @@ export default function ProjectsPage() {
                         />
                     )}
                     {selectedView === "map" && (
-                        <div className="w-full">
+                        <div className="w-[95vw] md:w-[70vw] h-[70vh] md:h-[90vh] mb-12">
                             <MapsComponent id="maps" tooltipRender={tooltipRender} loaded={onMapsLoad} load={load} itemSelection={shapeSelected}
                                            background='#F2F2F2'
-                                           zoomSettings={{enable: false}} height="700px" width="600px" mapsArea={{
+                                           zoomSettings={{enable: false}} height="100%" width="100%" mapsArea={{
                                 background: '#F2F2F2',
                                 border: {
                                     width: 0,

@@ -53,9 +53,9 @@ export async function POST(request, res) {
 
         try {
             await prisma.user.upsert({
-                where: {email},
-                update: {clerkId: id},
-                create: {email, clerkId: id},
+                where: { clerkId: id },
+                update: { email },
+                create: { clerkId: id, email },
             });
 
             return new Response('User created or updated successfully.', {

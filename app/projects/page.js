@@ -1,6 +1,6 @@
 'use client'
 
-import {useEffect, useState} from "react";
+import {useEffect, useState, Suspense} from "react";
 import {DateObject, Calendar} from "react-multi-date-picker";
 import {
     Autocomplete, AutocompleteItem,
@@ -25,10 +25,6 @@ countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 countries.registerLocale(require("i18n-iso-countries/langs/hu.json"));
 
 let datasource = data;
-const SAMPLE_CSS = `
-    .control-fluid {
-		padding: 0px !important;
-    }`;
 
 export default function ProjectsPage() {
 

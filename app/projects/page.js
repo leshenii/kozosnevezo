@@ -13,10 +13,10 @@ import {
     Tooltip,
     Avatar, Card, CardBody
 } from "@heroui/react";
-import gregorian_hu from "../../lib/gregorian_hu";
+import gregorian_hu from "../lib/gregorian_hu";
 import {MapsComponent, Inject, LayersDirective, LayerDirective, MapsTooltip, Selection } from '@syncfusion/ej2-react-maps';
-import * as data from '../../lib/tooltip-datasource.json';
-import * as worldMap from '../../lib/world-map.json';
+import * as data from '../lib/tooltip-datasource.json';
+import * as worldMap from '../lib/world-map.json';
 import {useRouter, redirect, useSearchParams} from 'next/navigation'
 import {snakeCase} from "snake-case";
 import removeAccents from 'remove-accents';

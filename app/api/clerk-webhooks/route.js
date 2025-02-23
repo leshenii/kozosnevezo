@@ -28,7 +28,7 @@ export async function POST(request, res) {
         })
     }
 
-    const payload = await req.json()
+    const payload = await request.json()
     const body = JSON.stringify(payload)
 
     let evt

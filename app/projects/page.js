@@ -59,6 +59,8 @@ export default function ProjectsPage() {
         if (args.data) {
             const country = args.data.name;
             setSelectedCountry(countries.getAlpha2Code(country, "en"));
+            setSelectedType(null);
+            setSelectedOrganization(null);
             setSelectedView('filter');
             router.push('/projects?view=filter&country=' + countries.getAlpha2Code(country, "en"), { shallow: true });
         }
@@ -327,7 +329,10 @@ export default function ProjectsPage() {
                                 </Autocomplete>
                             </div>
                             <div className="flex flex-col gap-3 mb-14">
-                                {filteredProjects.map(project => (
+                                {filteredProjects.length === 0 ? (
+                                    <p className="text-center mt-14 text-gray-700">Ilyen feltételekkel nincs rögzített projektünk!</p>
+                                ) :
+                                filteredProjects.map(project => (
                                     <Card key={project.id} isPressable>
                                         <CardBody>
                                             <div className="flex flex-row">

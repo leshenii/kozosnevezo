@@ -1,6 +1,6 @@
 'use client'
 
-import {useEffect, useState, Suspense} from "react";
+import {useEffect, useState} from "react";
 import {DateObject, Calendar} from "react-multi-date-picker";
 import {
     Autocomplete, AutocompleteItem,
@@ -171,11 +171,11 @@ export default function ProjectsPage() {
                 const end = normalizeDate(new Date(project.endDate));
                 return normalizedDate >= start && normalizedDate <= end;
             })
-            .map(project => project.title);
     }
 
     const mapDays = ({date, today}) => {
-        const projectTitles = getProjectTitles(date.toDate());
+        const projectTitlesRaw = getProjectTitles(date.toDate());
+        const projectTitles = projectTitlesRaw.map(project => project.title);
         return {
             children: projectTitles.length > 0 ? (
                 window.innerWidth < 640 ?
@@ -183,13 +183,14 @@ export default function ProjectsPage() {
                         <PopoverTrigger>
                             <div>{date.day}</div>
                         </PopoverTrigger>
-                        <PopoverContent>
+                        <PopoverContent className="items-start" onClick={() => redirect(`/projects/${projectTitlesRaw[0].id}`)}>
                             {projectTitles.join(', ')}
+                            <p className="text-xs text-blue-900">Részletekért kattints</p>
                         </PopoverContent>
                     </Popover>
                     :
-                    <Tooltip content={projectTitles.join(', ')} showArrow={true}>
-                        <div>{date.day}</div>
+                    <Tooltip content={projectTitles.join(', ')} showArrow={true} >
+                        <div onClick={() => redirect(`/projects/${projectTitlesRaw[0].id}`)} >{date.day}</div>
                     </Tooltip>
             ) : (
                 <div>{date.day}</div>
@@ -333,7 +334,7 @@ export default function ProjectsPage() {
                                     <p className="text-center mt-14 text-gray-700">Ilyen feltételekkel nincs rögzített projektünk!</p>
                                 ) :
                                 filteredProjects.map(project => (
-                                    <Card key={project.id} isPressable>
+                                    <Card key={project.id} isPressable onPress={() => redirect(`/projects/${project.id}`)}>
                                         <CardBody>
                                             <div className="flex flex-row">
                                                 <div className="flex flex-col w-3/5 sm:w-1/2">

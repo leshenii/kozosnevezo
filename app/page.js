@@ -32,7 +32,7 @@ export default function Home() {
         const overlayContainer = document.querySelector('[data-overlay-container="true"]');
         if (overlayContainer) {
             overlayContainer.removeAttribute('aria-hidden');
-            overlayContainer.setAttribute('inert', '');
+            //overlayContainer.setAttribute('inert', '');
         }
     }, []);
 

@@ -17,6 +17,7 @@
     "@clerk/nextjs": "^6.10.2",
     "@heroui/react": "^2.6.14",
     "@heroui/skeleton": "^2.2.6",
+    "@internationalized/date": "^3.7.0",
     "@prisma/client": "^6.2.1",
     "@prisma/extension-accelerate": "^1.2.1",
     "@react-aria/i18n": "^3.12.5",

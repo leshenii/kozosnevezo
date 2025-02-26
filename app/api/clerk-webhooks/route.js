@@ -48,13 +48,13 @@ export async function POST(request, res) {
     }
 
     if (evt.type === 'user.created' || evt.type === 'user.updated') {
-        const {id, email_addresses} = evt.data;
+        const {id, email_addresses, last_name, first_name} = evt.data;
         const email = email_addresses[0].email_address;
 
         try {
             await prisma.user.upsert({
                 where: { clerkId: id },
-                update: { email },
+                update: { email, firstName: first_name, lastName: last_name },
                 create: { clerkId: id, email },
             });
 

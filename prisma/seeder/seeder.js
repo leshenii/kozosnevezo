@@ -353,6 +353,10 @@ const instagramPosts = [
     {
         url: 'https://www.instagram.com/p/DFAAX1ONG_6/embed',
         date: "2025-01-19T23:59:59+02:00"
+    },
+    {
+        url: 'https://www.instagram.com/p/DGOjq1Lxjtt/embed',
+        date: "2025-02-18T23:59:59+02:00"
     }
 ];
 
@@ -426,7 +430,7 @@ const projects = [
         organization: "Asociación EuroMuévete"
     },
     {
-        type: "Mobility Project",
+        type: "Advanced Planning Visit",
         title: "Networking generates oppurtunities",
         country: "Lengyelország",
         location: "Starogard Gdanski",

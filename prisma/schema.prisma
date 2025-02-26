@@ -44,6 +44,8 @@ model Project {
 
 model User {
   id                   Int                  @id @default(autoincrement())
+  firstName            String               @default("no name")
+  lastName             String               @default("no name")
   email                String               @unique
   clerkId              String?              @unique
   projectsParticipated ProjectParticipant[]

@@ -28,14 +28,6 @@ export default function Home() {
         fetchProjects()
     }, []);
 
-    useEffect(() => {
-        const overlayContainer = document.querySelector('[data-overlay-container="true"]');
-        if (overlayContainer) {
-            overlayContainer.removeAttribute('aria-hidden');
-            //overlayContainer.setAttribute('inert', '');
-        }
-    }, []);
-
     return (
         <div className="flex flex-col items-center border-red-600 justify-center pb-[50px] h-screen-minus-navbar">
             <span className="kanit-semibold text-6xl">Már nem kevesebb, mint</span>

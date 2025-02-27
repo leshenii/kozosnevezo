@@ -7,21 +7,19 @@ import {
     Avatar,
     Button,
     Card,
-    Input, Modal, ModalBody, ModalContent,
+    Input,
     RangeCalendar,
     Select,
     SelectItem,
-    Spinner, useDisclosure
+    Spinner
 } from "@heroui/react";
 import {snakeCase} from "snake-case";
 import {parseDate} from "@internationalized/date";
 import countries from "i18n-iso-countries";
 import * as worldMap from '../../lib/world-map.json';
-import removeAccents from 'remove-accents';
 
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 countries.registerLocale(require("i18n-iso-countries/langs/hu.json"));
-
 
 export default function ProjectPage({params}) {
 
@@ -32,8 +30,10 @@ export default function ProjectPage({params}) {
     const [editMode, setEditMode] = useState(false);
     const [projectType, setProjectType] = useState(new Set(["training_course"]));
     const [touched, setTouched] = useState(false);
-    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    const [isAddUserSelectionOpen, setIsAddUserSelectionOpen] = useState(false);
     const [users, setUsers] = useState([]);
+    const [participants, setParticipants] = useState([]);
+    const [participantValue, setParticipantValue] = useState({ id: null, name: '' });
 
     const europeanFeatures = worldMap.features.filter(
         feature => feature.properties.continent === 'Europe'
@@ -56,7 +56,6 @@ export default function ProjectPage({params}) {
         {key: "youth_exchange", label: "Youth Exchange"},
         {key: "training_course", label: "Training Course"},
         {key: "advanced_planning_visit", label: "Advanced Planning Visit"},
-
     ];
 
     const fetchProject = async () => {
@@ -100,6 +99,7 @@ export default function ProjectPage({params}) {
             const resolvedParams = await params;
             setId(resolvedParams.id);
         }
+
         fetchParams()
     }, [params]);
 
@@ -108,19 +108,16 @@ export default function ProjectPage({params}) {
         fetchUsers()
     }, [id]);
 
+    useEffect(() => {
+        console.log(participants)
+    }, [participants]);
+
+    useEffect(() => {
+        console.log(participantValue)
+    }, [participantValue]);
+
     return (
         <>
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalBody>
-
-                            </ModalBody>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
             {!isUsersLoaded || !isProjectLoaded ? (
                 <div className="text-center">
                     <Spinner color="primary" size="lg" className="pt-20"/>
@@ -173,7 +170,7 @@ export default function ProjectPage({params}) {
                                         <div>
                                             <div className="flex flex-row gap-2 items-center">
                                                 <Autocomplete
-                                                    errorMessage={project.country && project.country.length > 0 || !touched ? "" : "Választanod kell egy projekt típust!"}
+                                                    errorMessage={project.country && project.country.length > 0 || !touched ? "" : "Választanod kell egy országot!"}
                                                     isInvalid={project.country && project.country.length > 0 || !touched ? false : true}
                                                     onClose={() => setTouched(true)}
                                                     defaultItems={europeanCountries}
@@ -200,6 +197,7 @@ export default function ProjectPage({params}) {
                                                 </Autocomplete>
                                                 <div>
                                                     <Input
+                                                        isClearable
                                                         variant="underlined"
                                                         color="primary"
                                                         value={project.location}
@@ -268,10 +266,54 @@ export default function ProjectPage({params}) {
                                                 variant="ghost"
                                                 radius="full"
                                                 size="sm"
+                                                onPress={() => setIsAddUserSelectionOpen(true)}
                                             >
                                                 Hozzáadás
                                             </Button>
                                         </div>
+                                        {isAddUserSelectionOpen &&
+                                            <>
+                                                <Autocomplete
+                                                    defaultItems={users.map(user => ({
+                                                        key: user.id,
+                                                        label: user.lastName + ' ' + user.firstName
+                                                    }))}
+                                                    allowsCustomValue
+                                                    label="Résztvevő"
+                                                    placeholder="Add meg egy résztvevőt"
+                                                    color="primary"
+                                                    variant="underlined"
+                                                    selectedKey={null}
+                                                    inputValue={participantValue.name}
+                                                    onInputChange={(value) => setParticipantValue({ ...participantValue, id: null, name: value })}
+                                                    onKeyUp={(e) => {
+                                                        e.continuePropagation()
+                                                        if (e.key === 'Enter') {
+                                                            setParticipants([...participants, participantValue]);
+                                                            setParticipantValue({ id: null, name: '' });
+                                                        }
+                                                    }}
+                                                    onSelectionChange={(selected) => {
+                                                        const user = users.find(user => user.id === parseInt(selected));
+                                                        if (user) {
+                                                            setParticipants([...participants, { id: user.id, name: user.lastName + ' ' + user.firstName }]);
+                                                            setParticipantValue({ id: null, name: '' });
+                                                        }
+                                                    }}
+                                                >
+                                                    {(user) => <AutocompleteItem key={user.key}>
+                                                        {user.label}
+                                                    </AutocompleteItem>}
+                                                </Autocomplete>
+                                                <ul className="list-none">
+                                                    {participants.map((participant, index) => (
+                                                        <li key={`${participant.id}-${index}`}>
+                                                            <p>{participant.name}</p>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </>
+                                        }
                                     </div>
                                 </div>
                             </Card>

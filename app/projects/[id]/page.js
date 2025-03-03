@@ -188,7 +188,7 @@ export default function ProjectPage({params}) {
                                         onValueChange={(value) => setProject({...project, title: value})}
                                         classNames={{
                                             input: "kanit-bold text-4xl text-center mt-2",
-                                            mainWrapper: "w-fit self-center mt-2 pl-6"
+                                            mainWrapper: "w-full sm:w-fit self-center sm:mt-2 sm:pl-6"
                                         }}
                                         fullWidth={false}
                                     ></Input>
@@ -202,7 +202,7 @@ export default function ProjectPage({params}) {
                                         selectedKeys={projectType}
                                         classNames={{
                                             value: "pl-7 !text-gray-600 text-xl text-center",
-                                            mainWrapper: "w-fit min-w-96 self-center"
+                                            mainWrapper: "w-full sm:w-1/2 self-center"
                                         }}
                                     >
                                         {projectTypes.map((type) => (

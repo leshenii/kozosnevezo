@@ -6,7 +6,7 @@ import {
     AutocompleteItem,
     Avatar,
     Button,
-    Card,
+    Card, Chip,
     Input,
     RangeCalendar,
     Select,
@@ -17,6 +17,8 @@ import {snakeCase} from "snake-case";
 import {parseDate} from "@internationalized/date";
 import countries from "i18n-iso-countries";
 import * as worldMap from '../../lib/world-map.json';
+import {useUser} from "@clerk/nextjs";
+import {BiEditAlt, BiSolidEditAlt, BiSolidSave, BiSolidUser, BiSolidXCircle} from "react-icons/bi";
 
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 countries.registerLocale(require("i18n-iso-countries/langs/hu.json"));
@@ -30,10 +32,11 @@ export default function ProjectPage({params}) {
     const [editMode, setEditMode] = useState(false);
     const [projectType, setProjectType] = useState(new Set(["training_course"]));
     const [touched, setTouched] = useState(false);
-    const [isAddUserSelectionOpen, setIsAddUserSelectionOpen] = useState(false);
     const [users, setUsers] = useState([]);
     const [participants, setParticipants] = useState([]);
-    const [participantValue, setParticipantValue] = useState({ id: null, name: '' });
+    const [participantValue, setParticipantValue] = useState({id: null, name: ''});
+    const {isLoaded, user} = useUser()
+    const [isButtonsDisabled, setIsButtonsDisabled] = useState(false);
 
     const europeanFeatures = worldMap.features.filter(
         feature => feature.properties.continent === 'Europe'
@@ -65,6 +68,11 @@ export default function ProjectPage({params}) {
         })
             .then(response => response.json())
             .then(project => {
+                console.log(project)
+                setParticipants(project.participants.map(participant => ({
+                    id: participant.user.id,
+                    name: participant.user.lastName + ' ' + participant.user.firstName
+                })))
                 setProject(project)
                 setProjectType(new Set([snakeCase(project.type)]))
                 setIsProjectLoaded(true)
@@ -91,10 +99,6 @@ export default function ProjectPage({params}) {
     }
 
     useEffect(() => {
-        console.log(users)
-    }, [users]);
-
-    useEffect(() => {
         async function fetchParams() {
             const resolvedParams = await params;
             setId(resolvedParams.id);
@@ -108,13 +112,24 @@ export default function ProjectPage({params}) {
         fetchUsers()
     }, [id]);
 
-    useEffect(() => {
-        console.log(participants)
-    }, [participants]);
+    const updateProject = async () => {
+        await fetch(`/api/projectsapi/project`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({id, ...project, participants})
+        })
+            .then(response => response.json())
+            .then(updatedProject => {
+                setProject(updatedProject);
+                setEditMode(false);
+            })
+            .catch(error => {
+                console.error('Error updating project:', error);
+            });
+    };
 
-    useEffect(() => {
-        console.log(participantValue)
-    }, [participantValue]);
 
     return (
         <>
@@ -124,13 +139,43 @@ export default function ProjectPage({params}) {
                 </div>
             ) : (
                 project && (
-                    <div className="flex flex-col w-screen sm:w-2/3 mx-4 mt-5 mb-14 gap-2">
-                        <div className="flex justify-end">
-                            <Button color="primary" variant="ghost" radius="full"
-                                    onPress={() => setEditMode(!editMode)}>
-                                Projekt módosítása
-                            </Button>
-                        </div>
+                    <div className="flex flex-col justify-center mx-4 mt-5 mb-14 gap-2">
+                        {isLoaded && user && user.publicMetadata.role === "admin" && (
+                            <div className="flex justify-end gap-2">
+                                {editMode ? (
+                                    <>
+                                        <Button color="secondary" variant="ghost" radius="full"
+                                                isDisabled={isButtonsDisabled}
+                                                onPress={() => {
+                                                    setIsButtonsDisabled(true)
+                                                    window.location.reload()
+                                                }}
+                                                startContent={<BiSolidXCircle/>}>
+                                            Vissza
+                                        </Button>
+                                        <Button color="success" variant="ghost" radius="full"
+                                                isDisabled={isButtonsDisabled}
+                                                onPress={() => {
+                                                    setIsButtonsDisabled(true)
+                                                    updateProject()
+                                                }}
+                                                startContent={<BiSolidSave/>}>
+                                            Mentés
+                                        </Button>
+                                    </>
+                                ) : (
+
+                                    <Button color="primary" variant="ghost" radius="full"
+                                            onPress={() => setEditMode(!editMode)}
+                                            startContent={<BiSolidEditAlt size="1.5em"/>}>
+                                        Projekt módosítása
+                                    </Button>
+
+                                )
+                                }
+                            </div>
+                        )}
+
                         {editMode ?
                             <Card className="p-4 flex flex-col gap-2">
                                 <div>
@@ -142,7 +187,7 @@ export default function ProjectPage({params}) {
                                         value={project.title}
                                         onValueChange={(value) => setProject({...project, title: value})}
                                         classNames={{
-                                            input: "kanit-bold text-5xl text-center mt-2",
+                                            input: "kanit-bold text-4xl text-center mt-2",
                                             mainWrapper: "w-fit self-center mt-2 pl-6"
                                         }}
                                         fullWidth={false}
@@ -165,83 +210,89 @@ export default function ProjectPage({params}) {
                                         ))}
                                     </Select>
                                 </div>
-                                <div className="flex flex-row gap-2">
+                                <div className="flex flex-col gap-2">
                                     <div className="flex flex-col gap-2 flex-grow !w-full">
-                                        <div>
-                                            <div className="flex flex-row gap-2 items-center">
-                                                <Autocomplete
-                                                    errorMessage={project.country && project.country.length > 0 || !touched ? "" : "Választanod kell egy országot!"}
-                                                    isInvalid={project.country && project.country.length > 0 || !touched ? false : true}
-                                                    onClose={() => setTouched(true)}
-                                                    defaultItems={europeanCountries}
-                                                    label="Ország"
-                                                    placeholder="Adj meg egy országot"
-                                                    color="primary"
-                                                    variant="underlined"
-                                                    defaultSelectedKey={project.country ? countries.getAlpha2Code(project.country, 'hu').toLowerCase() : null}
-                                                    onSelectionChange={(selected) => setProject({
-                                                        ...project,
-                                                        country: countries.getName(selected, 'hu') ? countries.getName(selected, 'hu') : null
-                                                    })}
-                                                    className={"w-56"}
-                                                    startContent={project.country &&
-                                                        <Avatar alt="flag" className="!w-6 !h-6 min-w-[24px]"
-                                                                src={`https://flagcdn.com/${countries.getAlpha2Code(project.country, 'hu').toLowerCase()}.svg`}/>}
-                                                >
-                                                    {(country) => <AutocompleteItem key={country.key} startContent={
-                                                        <Avatar alt="flag" className="w-6 h-6"
-                                                                src={`https://flagcdn.com/${country.key}.svg`}/>
-                                                    }>
-                                                        {country.label}
-                                                    </AutocompleteItem>}
-                                                </Autocomplete>
-                                                <div>
-                                                    <Input
-                                                        isClearable
-                                                        variant="underlined"
+                                        <div className="flex flex-col sm:flex-row items-center gap-2">
+                                            <div>
+                                                <div className="flex flex-col gap-2 ">
+                                                    <Autocomplete
+                                                        errorMessage={project.country && project.country.length > 0 || !touched ? "" : "Választanod kell egy országot!"}
+                                                        isInvalid={project.country && project.country.length > 0 || !touched ? false : true}
+                                                        onClose={() => setTouched(true)}
+                                                        defaultItems={europeanCountries}
+                                                        label="Ország"
+                                                        placeholder="Adj meg egy országot"
                                                         color="primary"
-                                                        value={project.location}
-                                                        onValueChange={(value) => setProject({
+                                                        variant="underlined"
+                                                        defaultSelectedKey={project.country ? countries.getAlpha2Code(project.country, 'hu').toLowerCase() : null}
+                                                        onSelectionChange={(selected) => setProject({
                                                             ...project,
-                                                            location: value
+                                                            country: countries.getName(selected, 'hu') ? countries.getName(selected, 'hu') : null
                                                         })}
-                                                        label="Város"
+                                                        startContent={project.country &&
+                                                            <Avatar alt="flag" className="!w-6 !h-6 min-w-[24px]"
+                                                                    src={`https://flagcdn.com/${countries.getAlpha2Code(project.country, 'hu').toLowerCase()}.svg`}/>}
                                                     >
+                                                        {(country) => <AutocompleteItem key={country.key}
+                                                                                        startContent={
+                                                                                            <Avatar alt="flag"
+                                                                                                    className="w-6 h-6"
+                                                                                                    src={`https://flagcdn.com/${country.key}.svg`}/>
+                                                                                        }>
+                                                            {country.label}
+                                                        </AutocompleteItem>}
+                                                    </Autocomplete>
+                                                    <div>
+                                                        <Input
+                                                            isClearable
+                                                            variant="underlined"
+                                                            color="primary"
+                                                            value={project.location}
+                                                            onValueChange={(value) => setProject({
+                                                                ...project,
+                                                                location: value
+                                                            })}
+                                                            label="Város"
+                                                        >
 
-                                                    </Input>
+                                                        </Input>
+                                                    </div>
+
                                                 </div>
-
+                                                <iframe className="mt-2" width="300" height="300"
+                                                        style={{border: '0'}}
+                                                        loading="lazy"
+                                                        allowFullScreen
+                                                        src={`https://www.google.com/maps/embed/v1/place?q=${project.location},${project.country}&key=AIzaSyBQpb-zeHME6F8U4pDQIMpZ3gx3ScgnfuE`}></iframe>
                                             </div>
-                                            <iframe className="mt-2" width="300" height="300" style={{border: '0'}}
-                                                    loading="lazy"
-                                                    allowFullScreen
-                                                    src={`https://www.google.com/maps/embed/v1/place?q=${project.location},${project.country}&key=AIzaSyBQpb-zeHME6F8U4pDQIMpZ3gx3ScgnfuE`}></iframe>
+                                            <div>
+                                                <p className="text-gray-700 text-sm">{new Date(project.startDate).toLocaleDateString('hu-HU', {
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric'
+                                                })} - {new Date(project.endDate).toLocaleDateString('hu-HU', {
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric'
+                                                })}</p>
+                                                <RangeCalendar
+                                                    calendarWidth={300}
+                                                    color="primary"
+                                                    value={{
+                                                        start: parseDate(new Date(project.startDate).toISOString().split('T')[0]),
+                                                        end: parseDate(new Date(project.endDate).toISOString().split('T')[0])
+                                                    }}
+                                                    onChange={(value) => setProject({
+                                                        ...project,
+                                                        startDate: new Date(value.start),
+                                                        endDate: new Date(value.end)
+                                                    })}
+                                                />
+                                            </div>
                                         </div>
-                                        <p className="text-gray-700 text-sm">{new Date(project.startDate).toLocaleDateString('hu-HU', {
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric'
-                                        })} - {new Date(project.endDate).toLocaleDateString('hu-HU', {
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric'
-                                        })}</p>
-                                        <RangeCalendar
-                                            calendarWidth={300}
-                                            color="primary"
-                                            value={{
-                                                start: parseDate(new Date(project.startDate).toISOString().split('T')[0]),
-                                                end: parseDate(new Date(project.endDate).toISOString().split('T')[0])
-                                            }}
-                                            onChange={(value) => setProject({
-                                                ...project,
-                                                startDate: new Date(value.start),
-                                                endDate: new Date(value.end)
-                                            })}
-                                        />
                                         <p>{project.organization}</p>
                                     </div>
-                                    <div className="flex flex-col gap-2 flex-gorw min-w-1/2 w-full">
+                                    <div className="flex flex-col gap-2 w-full sm:w-1/2">
                                         <div className="flex flex-row gap-2 w-full justify-end">
                                             <div
                                                 className="border-solid border-0 border-l-[3px] border-blue-900 justify-self-start flex-grow ">
@@ -259,86 +310,93 @@ export default function ProjectPage({params}) {
                                         <div className="flex flex-row gap-2 w-full justify-end">
                                             <div
                                                 className="border-solid border-0 border-l-[3px] border-blue-900 justify-self-start flex-grow ">
-                                                <h2 className="kanit-semibold text-xl ml-2 text-gray-800">Résztvevők</h2>
+                                                <div className="flex flex-row gap-2">
+                                                    <h2 className="kanit-semibold text-xl ml-2 text-gray-800">Résztvevők</h2>
+                                                    <Chip color="primary"
+                                                          size="sm"
+                                                          endContent={<BiSolidUser/>}
+                                                    >{participants.length} résztvevő</Chip>
+                                                </div>
                                             </div>
-                                            <Button
-                                                color="primary"
-                                                variant="ghost"
-                                                radius="full"
-                                                size="sm"
-                                                onPress={() => setIsAddUserSelectionOpen(true)}
-                                            >
-                                                Hozzáadás
-                                            </Button>
                                         </div>
-                                        {isAddUserSelectionOpen &&
-                                            <>
-                                                <Autocomplete
-                                                    defaultItems={users.map(user => ({
-                                                        key: user.id,
-                                                        label: user.lastName + ' ' + user.firstName
-                                                    }))}
-                                                    allowsCustomValue
-                                                    label="Résztvevő"
-                                                    placeholder="Add meg egy résztvevőt"
-                                                    color="primary"
-                                                    variant="underlined"
-                                                    selectedKey={null}
-                                                    inputValue={participantValue.name}
-                                                    onInputChange={(value) => setParticipantValue({ ...participantValue, id: null, name: value })}
-                                                    onKeyUp={(e) => {
-                                                        e.continuePropagation()
-                                                        if (e.key === 'Enter') {
-                                                            setParticipants([...participants, participantValue]);
-                                                            setParticipantValue({ id: null, name: '' });
-                                                        }
-                                                    }}
-                                                    onSelectionChange={(selected) => {
-                                                        const user = users.find(user => user.id === parseInt(selected));
-                                                        if (user) {
-                                                            setParticipants([...participants, { id: user.id, name: user.lastName + ' ' + user.firstName }]);
-                                                            setParticipantValue({ id: null, name: '' });
-                                                        }
-                                                    }}
-                                                >
-                                                    {(user) => <AutocompleteItem key={user.key}>
-                                                        {user.label}
-                                                    </AutocompleteItem>}
-                                                </Autocomplete>
-                                                <ul className="list-none">
-                                                    {participants.map((participant, index) => (
-                                                        <li key={`${participant.id}-${index}`}>
-                                                            <p>{participant.name}</p>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </>
-                                        }
+                                        <Autocomplete
+                                            defaultItems={users.map(user => ({
+                                                key: user.id,
+                                                label: user.lastName + ' ' + user.firstName
+                                            }))}
+                                            allowsCustomValue
+                                            label="Résztvevő hozzáadása"
+                                            placeholder="Add meg a résztvevőt"
+                                            color="primary"
+                                            variant="underlined"
+                                            selectedKey={null}
+                                            inputValue={participantValue.name}
+                                            onInputChange={(value) => setParticipantValue({
+                                                ...participantValue,
+                                                id: null,
+                                                name: value
+                                            })}
+                                            onKeyUp={(e) => {
+                                                e.continuePropagation()
+                                                if (e.key === 'Enter') {
+                                                    setParticipants([...participants, participantValue]);
+                                                    setParticipantValue({id: null, name: ''});
+                                                }
+                                            }}
+                                            onSelectionChange={(selected) => {
+                                                const user = users.find(user => user.id === parseInt(selected));
+                                                if (user) {
+                                                    setParticipants([...participants, {
+                                                        id: user.id,
+                                                        name: user.lastName + ' ' + user.firstName
+                                                    }]);
+                                                    setParticipantValue({id: null, name: ''});
+                                                }
+                                            }}
+                                        >
+                                            {(user) => <AutocompleteItem key={user.key}>
+                                                {user.label}
+                                            </AutocompleteItem>}
+                                        </Autocomplete>
+                                        {participants.map((participant, index) => (
+                                            <Chip
+                                                endContent={<BiSolidXCircle/>}
+                                                color="primary"
+                                                variant="bordered"
+                                                radius="full"
+                                                key={participant + index}
+                                                onClose={() => setParticipants(participants.filter((_, i) => i !== index))}
+                                            >
+                                                {participant.name}
+                                            </Chip>
+                                        ))}
                                     </div>
                                 </div>
                             </Card>
                             :
-                            <Card className="p-4 flex flex-col gap-2">
+                            <Card className="p-4 flex flex-col gap-2 w-fit">
                                 <div className="">
-                                    <h1 className="kanit-bold text-5xl text-center mt-2">{project.title}</h1>
+                                    <h1 className="kanit-bold text-4xl text-center mt-2">{project.title}</h1>
                                     <p className="text-gray-700 text-xl text-center">{project.type}</p>
+                                    <p>{project.organization}</p>
                                 </div>
 
-                                <div className="flex flex-row gap-2 flex-grow" id="users">
-                                    <div className="flex flex-col gap-2">
-                                        <div>
+                                <div className="flex flex-col gap-2 flex-grow">
+                                    <div className="flex flex-col sm:flex-row items-center gap-2 w-full justify-center">
+                                        <div className="flex flex-col" id="location_and_map">
                                             <div className="flex flex-row gap-2 items-center">
                                                 <Avatar alt="flag" size="sm"
                                                         src={`https://flagcdn.com/${snakeCase(countries.getAlpha2Code(project.country, 'hu'))}.svg`}/>
                                                 <p>{project.country}, {project.location}</p>
                                             </div>
-                                            <iframe className="mt-2" width="300" height="300" style={{border: '0'}}
+                                            <iframe className="mt-2" width="300" height="300"
+                                                    style={{border: '0'}}
                                                     loading="lazy"
                                                     allowFullScreen
                                                     src={`https://www.google.com/maps/embed/v1/place?q=${project.location},${project.country}&key=AIzaSyBQpb-zeHME6F8U4pDQIMpZ3gx3ScgnfuE`}></iframe>
                                         </div>
-                                        <div>
-                                            <p className="text-gray-700 text-sm">{new Date(project.startDate).toLocaleDateString('hu-HU', {
+                                        <div className="flex flex-col pt-5" id="date_and_calendar">
+                                            <p className="text-gray-700 text-sm text-right">{new Date(project.startDate).toLocaleDateString('hu-HU', {
                                                 year: 'numeric',
                                                 month: 'long',
                                                 day: 'numeric'
@@ -357,8 +415,6 @@ export default function ProjectPage({params}) {
                                                 }}
                                             />
                                         </div>
-
-                                        <p>{project.organization}</p>
                                     </div>
                                     <div className="flex flex-col gap-2 flex-gorw min-w-1/2 w-full">
                                         <div className="border-solid border-0 border-l-[3px] border-blue-900">
@@ -367,7 +423,28 @@ export default function ProjectPage({params}) {
                                         <div className="flex flex-row gap-2 w-full justify-end">
                                             <div
                                                 className="border-solid border-0 border-l-[3px] border-blue-900 justify-self-start flex-grow ">
-                                                <h2 className="kanit-semibold text-xl ml-2 text-gray-800">Résztvevők</h2>
+                                                <div className="flex flex-row gap-2">
+                                                    <h2 className="kanit-semibold text-xl ml-2 text-gray-800">Résztvevők</h2>
+                                                    <Chip color="primary"
+                                                          size="sm"
+                                                          endContent={<BiSolidUser/>}
+                                                    >{participants.length} résztvevő</Chip>
+                                                </div>
+                                                {user && user.publicMetadata.role === "admin" && (
+                                                    <div className="flex flex-col gap-1 ml-2">
+                                                        {participants.map((participant, index) => (
+                                                            <Chip
+                                                                startContent={<BiSolidUser/>}
+                                                                color="primary"
+                                                                variant="bordered"
+                                                                radius="full"
+                                                                key={participant + index}
+                                                            >
+                                                                {participant.name}
+                                                            </Chip>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

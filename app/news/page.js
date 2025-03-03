@@ -14,6 +14,7 @@ import {
     Input, Textarea,
 } from "@heroui/react";
 import {Skeleton} from "@heroui/skeleton";
+import {BiLogoInstagram, BiLogoTiktok, BiMailSend} from "react-icons/bi";
 
 export default function NewsPage() {
 
@@ -21,7 +22,7 @@ export default function NewsPage() {
     const [posts, setPosts] = useState([])
     const [visibleCount, setVisibleCount] = useState(12);
     const loaderRef = useRef(null);
-    const [selectedPostTypes, setSelectedPostTypes] = useState(["tiktok", "instagram", "kozlemenyek"]);
+    const [selectedPostTypes, setSelectedPostTypes] = useState(["tiktok", "instagram", "levelek"]);
     const [isPostTypeSelectionInvalid, setIsPostTypeSelectionInvalid] = useState(false);
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [postTitleValue, setPostTitleValue] = useState("");
@@ -73,7 +74,7 @@ export default function NewsPage() {
         if (selectedPostTypes.includes('instagram') && post.url?.includes('www.instagram.com')) {
             return true;
         }
-        return selectedPostTypes.includes('kozlemenyek') && post.title;
+        return selectedPostTypes.includes('levelek') && post.title;
     });
 
     const savePostEvent = async () => {
@@ -135,7 +136,7 @@ export default function NewsPage() {
                     <div className="w-auto sm:w-auto">
                         <CheckboxGroup
                             color="primary"
-                            defaultValue={["tiktok", "instagram", "kozlemenyek"]}
+                            defaultValue={["tiktok", "instagram", "levelek"]}
                             label="Milyen híreket szeretnél látni?"
                             value={selectedPostTypes}
                             isPostTypeSelectionInvalid={isPostTypeSelectionInvalid}
@@ -146,14 +147,18 @@ export default function NewsPage() {
                             }}
                             orientation="horizontal"
                         >
-                            <Checkbox className="mr-1" value="tiktok">TikTok</Checkbox>
-                            <Checkbox className="mr-1" value="instagram">Instagram</Checkbox>
-                            <Checkbox value="kozlemenyek">Közlemények</Checkbox>
+                            <Checkbox className="mr-1" value="tiktok"><div className="flex flex-row gap-1 items-center"> <BiLogoTiktok/> TikTok</div></Checkbox>
+                            <Checkbox className="mr-1" value="instagram">
+                                <div className="flex flex-row gap-1 items-center"><BiLogoInstagram/> Instagram</div>
+                            </Checkbox>
+                            <Checkbox value="levelek">
+                                <div className="flex flex-row gap-1 items-center"><BiMailSend /> Levelek</div>
+                            </Checkbox>
                         </CheckboxGroup>
                     </div>
                     <div className="sm:hidden my-3 sm:my-auto h-full flex justify-end">
                         <Button color="primary" radius="full" variant="ghost"
-                                onPress={onOpen}>
+                                onPress={onOpen} startContent={<BiMailSend size="1.5em" />}>
                             <p className='kanit-semibold text-large'>Új hírt közlök</p>
                         </Button>
                     </div>
@@ -162,7 +167,7 @@ export default function NewsPage() {
                 <div className="w-1/6"></div>
                 <div className="hidden sm:block w-1/6 text-right">
                     <Button color="primary" radius="full" variant="ghost"
-                            onPress={onOpen}>
+                            onPress={onOpen} startContent={<BiMailSend size="1.5em" />}>
                         <p className='kanit-semibold text-large'>Új hírt közlök</p>
                     </Button>
                 </div>

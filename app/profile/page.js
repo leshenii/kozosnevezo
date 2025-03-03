@@ -1,6 +1,6 @@
 'use client'
 
-import {Button, Chip, Image, Spinner} from "@heroui/react";
+import {Chip, Image, Spinner} from "@heroui/react";
 import {useUser} from "@clerk/nextjs";
 
 export default function ProfilePage() {

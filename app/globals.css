@@ -9,7 +9,7 @@ body {
 }
 
 .h-screen-minus-navbar {
-  @apply h-[calc(100vh-70px)];
+  @apply h-[calc(100vh-150px)];
 }
 
 .kanit-regular {

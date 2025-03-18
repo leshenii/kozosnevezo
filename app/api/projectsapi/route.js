@@ -24,3 +24,33 @@ export async function GET(request) {
         await prisma.$disconnect();
     }
 }
+
+export async function PUT(request) {
+    if (request.method !== 'PUT') {
+        return new Response('Method Not Allowed', {
+            status: 405,
+        });
+    }
+
+    const data = await request.json();
+
+    try {
+        const createdProject = await prisma.project.create({
+            data,
+        });
+
+        return new Response(JSON.stringify(createdProject), {
+            status: 200,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    } catch (error) {
+        console.error('Error creating project:', error);
+        return new Response('Internal Server Error', {
+            status: 500,
+        });
+    } finally {
+        await prisma.$disconnect();
+    }
+}

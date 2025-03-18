@@ -7,18 +7,26 @@ import {
     Avatar,
     Button,
     Card, Chip,
-    Input,
+    Input, Modal, ModalBody, ModalContent,
     RangeCalendar,
     Select,
     SelectItem,
-    Spinner
+    Spinner, useDisclosure
 } from "@heroui/react";
 import {snakeCase} from "snake-case";
 import {parseDate} from "@internationalized/date";
 import countries from "i18n-iso-countries";
 import * as worldMap from '../../lib/world-map.json';
 import {useUser} from "@clerk/nextjs";
-import {BiEditAlt, BiSolidEditAlt, BiSolidSave, BiSolidUser, BiSolidXCircle} from "react-icons/bi";
+import {
+    BiEditAlt,
+    BiSolidEditAlt, BiSolidErrorCircle,
+    BiSolidLeftArrowCircle,
+    BiSolidSave, BiSolidTrash,
+    BiSolidUser,
+    BiSolidXCircle
+} from "react-icons/bi";
+import {router} from "next/client";
 
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 countries.registerLocale(require("i18n-iso-countries/langs/hu.json"));
@@ -37,6 +45,11 @@ export default function ProjectPage({params}) {
     const [participantValue, setParticipantValue] = useState({id: null, name: ''});
     const {isLoaded, user} = useUser()
     const [isButtonsDisabled, setIsButtonsDisabled] = useState(false);
+    const {
+        isOpen: isDeletionConfirmationModalOpen,
+        onOpen: onDeletionConfirmationModalOpen,
+        onClose: onDeletionConfirmationModalClose
+    } = useDisclosure();
 
     const europeanFeatures = worldMap.features.filter(
         feature => feature.properties.continent === 'Europe'
@@ -130,9 +143,49 @@ export default function ProjectPage({params}) {
             });
     };
 
+    const deleteProject = async () => {
+        if (!id) return;
+        await fetch(`/api/projectsapi/project?projectId=${id}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(project => {
+                router.push('/projects?view=calendar');
+            })
+            .catch(error => {
+                console.error('Error deleting project:', error)
+                setIsProjectLoaded(true)
+            });
+    }
+
 
     return (
         <>
+            <Modal isOpen={isDeletionConfirmationModalOpen} size="xs" onClose={onDeletionConfirmationModalClose}>
+                <ModalContent>
+                    {(onClose) => (
+                        <ModalBody className="items-center px-10 py-5">
+                            <BiSolidErrorCircle size="1.5rem" color="orange"/>
+                            <p className="text-center items-center justify-center ">
+                                Biztosan törölni szeretnéd a projektet az adatbázisból? A döntés nem visszafordítható!
+                            </p>
+                            <div className="flex flex-row gap-2">
+                                <Button variant="ghost" color="primary" radius="full"
+                                        onPress={onDeletionConfirmationModalClose}>
+                                    Mégse
+                                </Button>
+                                <Button variant="ghost" color="danger" radius="full" onPress={() => {
+                                    setIsButtonsDisabled(true)
+                                    deleteProject()
+                                    onDeletionConfirmationModalClose()
+                                }}>
+                                    Törlés
+                                </Button>
+                            </div>
+                        </ModalBody>
+                    )}
+                </ModalContent>
+            </Modal>
             {!isUsersLoaded || !isProjectLoaded ? (
                 <div className="text-center">
                     <Spinner color="primary" size="lg" className="pt-20"/>
@@ -144,14 +197,22 @@ export default function ProjectPage({params}) {
                             <div className="flex justify-end gap-2">
                                 {editMode ? (
                                     <>
-                                        <Button color="secondary" variant="ghost" radius="full"
+                                        <Button color="primary" variant="ghost" radius="full"
                                                 isDisabled={isButtonsDisabled}
                                                 onPress={() => {
                                                     setIsButtonsDisabled(true)
                                                     window.location.reload()
                                                 }}
-                                                startContent={<BiSolidXCircle/>}>
+                                                startContent={<BiSolidXCircle size="1.5rem"/>}>
                                             Vissza
+                                        </Button>
+                                        <Button color="danger" variant="ghost" radius="full"
+                                                isDisabled={isButtonsDisabled}
+                                                onPress={() => {
+                                                    onDeletionConfirmationModalOpen()
+                                                }}
+                                                startContent={<BiSolidTrash size="1.5rem"/>}>
+                                            Törlés
                                         </Button>
                                         <Button color="success" variant="ghost" radius="full"
                                                 isDisabled={isButtonsDisabled}
@@ -159,7 +220,9 @@ export default function ProjectPage({params}) {
                                                     setIsButtonsDisabled(true)
                                                     updateProject()
                                                 }}
-                                                startContent={<BiSolidSave/>}>
+                                                startContent={<BiSolidSave size="1.5rem"/>}
+
+                                        >
                                             Mentés
                                         </Button>
                                     </>

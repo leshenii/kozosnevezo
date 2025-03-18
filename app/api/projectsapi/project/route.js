@@ -85,3 +85,38 @@ export async function PUT(request) {
         await prisma.$disconnect();
     }
 }
+
+export async function DELETE(request) {
+    if (request.method !== 'DELETE') {
+        return new Response('Method Not Allowed', {
+            status: 405,
+        });
+    }
+
+    const searchParams = request.nextUrl.searchParams;
+    const projectId = searchParams.get('projectId');
+
+    try {
+        await prisma.projectParticipant.deleteMany({
+            where: { projectId: parseInt(projectId) }
+        });
+
+        const project = await prisma.project.delete({
+            where: { id: parseInt(projectId) }
+        });
+
+        return new Response(JSON.stringify(project), {
+            status: 200,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    } catch (error) {
+        console.error('Error deleting project from database:', error);
+        return new Response('Internal Server Error', {
+            status: 500,
+        });
+    } finally {
+        await prisma.$disconnect();
+    }
+}

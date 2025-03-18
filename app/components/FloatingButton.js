@@ -16,43 +16,43 @@ export default function FloatingButton() {
             label: "Alapszabály",
         },
         {
-            key: "Beszámoló_2013.pdf",
+            key: "Beszamolo_2013.pdf",
             label: "Beszámoló 2013",
         },
         {
-            key: "Beszámoló_2014.pdf",
+            key: "Beszamolo_2014.pdf",
             label: "Beszámoló 2014",
         },
         {
-            key: "Beszámoló_2015.pdf",
+            key: "Beszamolo_2015.pdf",
             label: "Beszámoló 2015",
         },
         {
-            key: "Beszámoló_2016.pdf",
+            key: "Beszamolo_2016.pdf",
             label: "Beszámoló 2016",
         },
         {
-            key: "Beszámoló_2017.pdf",
+            key: "Beszamolo_2017.pdf",
             label: "Beszámoló 2017",
         },
         {
-            key: "Beszámoló_2018.pdf",
+            key: "Beszamolo_2018.pdf",
             label: "Beszámoló 2018",
         },
         {
-            key: "Beszámoló_2019.pdf",
+            key: "Beszamolo_2019.pdf",
             label: "Beszámoló 2019",
         },
         {
-            key: "Beszámoló_2020.pdf",
+            key: "Beszamolo_2020.pdf",
             label: "Beszámoló 2020",
         },
         {
-            key: "Beszámoló_2021.pdf",
+            key: "Beszamolo_2021.pdf",
             label: "Beszámoló 2021",
         },
         {
-            key: "Beszámoló_2022.pdf",
+            key: "Beszamolo_2022.pdf",
             label: "Beszámoló 2022",
         },
     ];

@@ -55,6 +55,10 @@ export default function FloatingButton() {
             key: "Beszamolo_2022.pdf",
             label: "Beszámoló 2022",
         },
+        {
+            key: "Beszamolo_2023.pdf",
+            label: "Beszámoló 2023",
+        },
     ];
 
     return (
@@ -62,7 +66,7 @@ export default function FloatingButton() {
             <div className="fab-center flex flex-row justify-center sm:hidden gap-2">
                 <Dropdown>
                     <DropdownTrigger>
-                        <Button variant="ghost" radius="full" size="md" color="primary">Beszámolók</Button>
+                        <Button variant="solid" radius="full" size="sm" color="primary">Dokumentumok</Button>
                     </DropdownTrigger>
                     <DropdownMenu aria-label="Dynamic Actions" items={items}>
                         {(item) => (
@@ -91,9 +95,9 @@ export default function FloatingButton() {
                     <MailIconMobile/>
                 </motion.div>
                 <SignedOut>
-                    <Button size="md" color="primary" radius="full" variant="solid"
+                    <Button size="sm" color="primary" radius="full" variant="solid"
                             onPress={() => router.push('/sign-in')} className=" sm:hidden">
-                        <p className='kanit-semibold text-large'>Bejelentkezés</p>
+                        <p className='kanit-semibold text-sm'>Bejelentkezés</p>
                     </Button>
                 </SignedOut>
                 <SignedIn>
@@ -119,7 +123,7 @@ export default function FloatingButton() {
                 </motion.div>
                 <Dropdown>
                     <DropdownTrigger>
-                        <Button variant="ghost" radius="full" size="sm" color="primary">Beszámolók</Button>
+                        <Button variant="solid" radius="full" size="sm" color="primary">Dokumentumok</Button>
                     </DropdownTrigger>
                     <DropdownMenu aria-label="Dynamic Actions" items={items}>
                         {(item) => (

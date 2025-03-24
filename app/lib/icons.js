@@ -1,7 +1,7 @@
 
 
 export const InstagramIconMobile = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470.33 470.26" width="40" height="40"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470.33 470.26" width="33" height="33"
          className="fill-blue-800">
         <path
             d="M224.6.19c138.29-5.49,251.51,108.32,245.5,246.5-5.27,121.03-107.46,220.63-228.5,223.5C114.14,473.21,3.79,370.53.1,242.69-3.58,115.38,96.89,5.26,224.6.19ZM170.6,94.19c-39.95,3.86-72.8,37.88-76.5,77.5v128c3.79,39.26,37.29,72.78,76.5,76.5h128c40.42-3.74,73.76-37.09,77.5-77.5v-127c-3.33-36.58-32.89-70.56-69.5-76.5-45.33-.33-90.67-.67-136-1Z"/>
@@ -24,7 +24,7 @@ export const InstagramIconDesktop = () => (
     </svg>
 )
 
-export const MailIconMobile = ({ width = "40", height = "40" }) => (
+export const MailIconMobile = ({ width = "33", height = "33" }) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 537 537" width={width} height={height}
          className="fill-blue-800">
         <path

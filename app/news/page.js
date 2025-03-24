@@ -15,6 +15,7 @@ import {
 } from "@heroui/react";
 import {Skeleton} from "@heroui/skeleton";
 import {BiLogoInstagram, BiLogoTiktok, BiMailSend} from "react-icons/bi";
+import {useUser} from "@clerk/nextjs";
 
 export default function NewsPage() {
 
@@ -27,6 +28,7 @@ export default function NewsPage() {
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [postTitleValue, setPostTitleValue] = useState("");
     const [postContentValue, setPostContentValue] = useState("");
+    const {isLoaded, user} = useUser()
 
     const fetchPosts = async () => {
         await fetch('/api/posts', {
@@ -156,21 +158,23 @@ export default function NewsPage() {
                             </Checkbox>
                         </CheckboxGroup>
                     </div>
+                    {isLoaded && user && user.publicMetadata.role === "admin" && (
                     <div className="sm:hidden my-3 sm:my-auto h-full flex justify-end">
                         <Button color="primary" radius="full" variant="ghost"
                                 onPress={onOpen} startContent={<BiMailSend size="1.5em" />}>
                             <p className='kanit-semibold text-large'>Új hírt közlök</p>
                         </Button>
-                    </div>
+                    </div>)}
                 </div>
                 <h1 className="hidden sm:block m-5 title w-2/6 text-center">Hírek</h1>
                 <div className="w-1/6"></div>
+                {isLoaded && user && user.publicMetadata.role === "admin" && (
                 <div className="hidden sm:block w-1/6 text-right">
                     <Button color="primary" radius="full" variant="ghost"
                             onPress={onOpen} startContent={<BiMailSend size="1.5em" />}>
                         <p className='kanit-semibold text-large'>Új hírt közlök</p>
                     </Button>
-                </div>
+                </div>)}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-4 w-11/12 gap-4 mb-4">
                 {isFeedLoading ? (

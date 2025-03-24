@@ -264,8 +264,8 @@ export default function ProjectPage({params}) {
                                         onSelectionChange={setProjectType}
                                         selectedKeys={projectType}
                                         classNames={{
-                                            value: "pl-7 !text-gray-600 text-xl text-center",
-                                            mainWrapper: "w-full sm:w-1/2 self-center"
+                                            value: "!text-gray-600 text-xl text-center",
+                                            mainWrapper: "w-full self-center"
                                         }}
                                     >
                                         {projectTypes.map((type) => (

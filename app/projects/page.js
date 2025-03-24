@@ -41,7 +41,9 @@ import {snakeCase} from "snake-case";
 import removeAccents from 'remove-accents';
 import countries from 'i18n-iso-countries';
 import {parseDate} from "@internationalized/date";
-import {BiSolidUser, BiSolidXCircle} from "react-icons/bi";
+import {BiSolidAddToQueue, BiSolidErrorCircle, BiSolidUser, BiSolidXCircle} from "react-icons/bi";
+import {TbHandClick} from "react-icons/tb";
+
 
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 countries.registerLocale(require("i18n-iso-countries/langs/hu.json"));
@@ -55,6 +57,12 @@ export default function ProjectsPage() {
     const europeanFeatures = worldMap.features.filter(
         feature => feature.properties.continent === 'Europe'
     );
+    const europeanCountries = europeanFeatures
+        .filter(country => country.properties.continent === "Europe")
+        .map(country => ({
+            key: countries.getAlpha2Code(country.properties.name, 'en').toLowerCase(),
+            label: countries.getName(countries.getAlpha2Code(country.properties.name, 'en'), 'hu')
+        }));
 
     const filteredGeoJson = {
         type: 'FeatureCollection',
@@ -81,8 +89,17 @@ export default function ProjectsPage() {
     const [selectedOrganization, setSelectedOrganization] = useState(searchParams.get('organization') === 'null' ? null : searchParams.get('organization'));
     const [selectedType, setSelectedType] = useState(searchParams.get('type') === 'null' ? null : searchParams.get('type'));
     const [filteredProjects, setFilteredProjects] = useState([])
-    const [createdProject, setCreatedProject] = useState(null)
+    const [createdProject, setCreatedProject] = useState({
+        title: "",
+        startDate: "",
+        endDate: "",
+        country: "",
+        location: "",
+        organization: "",
+        type: new Set(["youth_exchange"])
+    });
     const {isOpen: isCreationModalOpen, onOpen: onCreationModalOpen, onClose: onCreationModalClose} = useDisclosure();
+    const [touched, setTouched] = useState(false);
 
     const shapeSelected = (args) => {
 
@@ -266,7 +283,7 @@ export default function ProjectsPage() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({id, ...project, participants})
+            body: JSON.stringify({createdProject})
         })
             .then(response => response.json())
             .then(createdProject => {
@@ -277,22 +294,113 @@ export default function ProjectsPage() {
             });
     };
 
+    useEffect(() => {
+        console.log(createdProject);
+    }, [createdProject]);
+
     return (
         <>
+            <Modal isOpen={isCreationModalOpen} size="lg" onClose={onCreationModalClose}>
+                <ModalContent>
+                    {(onClose) => (
+                        <ModalBody className="">
+                            <Input
+                                variant="underlined"
+                                color="primary"
+                                size="lg"
+                                isClearable
+                                placeholder="Projekt címe"
+                                value={createdProject.title}
+                                onValueChange={(value) => setCreatedProject({...createdProject, title: value})}
+                                classNames={{
+                                    input: "kanit-bold text-4xl text-center mt-2",
+                                    mainWrapper: "w-full sm:w-fit self-center sm:mt-2 sm:pl-6"
+                                }}
+                                fullWidth={false}
+                            ></Input>
+                            <Select
+                                errorMessage={createdProject.type.size > 0 || !touched ? "" : "Választanod kell egy projekt típust!"}
+                                isInvalid={createdProject.type.size > 0 || !touched ? false : true}
+                                onClose={() => setTouched(true)}
+                                variant="underlined"
+                                color="primary"
+                                onSelectionChange={(selected) => setCreatedProject({...createdProject, type: selected})}
+                                selectedKeys={createdProject.type}
+                                classNames={{
+                                    value: "pl-7 !text-gray-600 text-xl text-center",
+                                    mainWrapper: "w-full sm:w-1/2 self-center"
+                                }}
+                            >
+                                {projectTypes.map((type) => (
+                                    <SelectItem key={type.key}>{type.label}</SelectItem>
+                                ))}
+                            </Select>
+                            <Autocomplete
+                                errorMessage={createdProject.country && createdProject.country.length > 0 || !touched ? "" : "Választanod kell egy országot!"}
+                                isInvalid={createdProject.country && createdProject.country.length > 0 || !touched ? false : true}
+                                onClose={() => setTouched(true)}
+                                defaultItems={europeanCountries}
+                                label="Ország"
+                                placeholder="Adj meg egy országot"
+                                color="primary"
+                                variant="underlined"
+                                defaultSelectedKey={createdProject.country ? countries.getAlpha2Code(createdProject.country, 'hu').toLowerCase() : null}
+                                onSelectionChange={(selected) => setCreatedProject({
+                                    ...createdProject,
+                                    country: countries.getName(selected, 'hu') ? countries.getName(selected, 'hu') : null
+                                })}
+                                startContent={createdProject.country &&
+                                    <Avatar alt="flag" className="!w-6 !h-6 min-w-[24px]"
+                                            src={`https://flagcdn.com/${countries.getAlpha2Code(createdProject.country, 'hu').toLowerCase()}.svg`}/>}
+                            >
+                                {(country) => <AutocompleteItem key={country.key}
+                                                                startContent={
+                                                                    <Avatar alt="flag"
+                                                                            className="w-6 h-6"
+                                                                            src={`https://flagcdn.com/${country.key}.svg`}/>
+                                                                }>
+                                    {country.label}
+                                </AutocompleteItem>}
+                            </Autocomplete>
 
+                            <div className="flex flex-row gap-2 justify-end">
+                                <Button variant="ghost" color="primary" radius="full"
+                                        onPress={onCreationModalClose}>
+                                    Mégse
+                                </Button>
+                                <Button variant="ghost" color="success" radius="full" onPress={() => {
+                                    createProject()
+                                    onCreationModalClose()
+                                }}>
+                                    Mentés
+                                </Button>
+                            </div>
+                        </ModalBody>
+                    )}
+                </ModalContent>
+            </Modal>
             <div className="mx-5">
                 <h1 className="mt-5 title text-center">Projektek</h1>
                 {isLoading ? <div className="text-center">
                         <Spinner color="primary" size="lg" className="pt-20"/>
                     </div> :
                     <>
-                        <RadioGroup label="Válassz nézetet:" value={selectedView} onValueChange={viewChange}
-                                    orientation="horizontal"
-                                    color="primary" className="my-4">
-                            <Radio value="calendar" className="mr-1">Naptár</Radio>
-                            <Radio value="map" className="mr-1">Térkép</Radio>
-                            <Radio value="filter">Szűrő</Radio>
-                        </RadioGroup>
+                        <div className="flex flex-row gap-2 items-center">
+                            <div className="w-4/5">
+                                <RadioGroup label="Válassz nézetet:" value={selectedView} onValueChange={viewChange}
+                                            orientation="horizontal"
+                                            color="primary" className="my-4">
+                                    <Radio value="calendar" className="mr-1">Naptár</Radio>
+                                    <Radio value="map" className="mr-1">Térkép</Radio>
+                                    <Radio value="filter">Szűrő</Radio>
+                                </RadioGroup></div>
+                            <div className="w-1/5 text-end">
+                                <Button startContent={<BiSolidAddToQueue size="1.3em"/>} color="primary" radius="full"
+                                        variant="ghost" onPress={onCreationModalOpen}>
+                                    Új projekt
+                                </Button>
+                            </div>
+                        </div>
                         {selectedView === "calendar" && (
                             <Calendar
                                 value={projectIntervals}
@@ -394,8 +502,12 @@ export default function ProjectsPage() {
                                                         <div className="flex flex-col w-3/5 sm:w-1/2">
                                                             <h2 className="kanit-bold text-xl">{project.title}</h2>
                                                             <p className="text-gray-700">{project.type}</p>
-                                                            <p className="text-blue-900 text-sm">Részletek
-                                                                megtekintéséhez kattints!</p>
+                                                            <div className="flex flex-row gap-1 text-blue-900">
+                                                                <p className=" text-sm">Részletek
+                                                                    megtekintéséhez kattints!</p>
+                                                                <TbHandClick/>
+                                                            </div>
+
                                                         </div>
                                                         <div
                                                             className="flex flex-col items-end text-end w-2/5 sm:w-1/2">

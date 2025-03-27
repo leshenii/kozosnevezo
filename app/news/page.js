@@ -11,7 +11,7 @@ import {
     Modal, ModalBody,
     ModalContent, ModalFooter, ModalHeader,
     useDisclosure,
-    Input, Textarea,
+    Input, Textarea, Image
 } from "@heroui/react";
 import {Skeleton} from "@heroui/skeleton";
 import {BiLogoInstagram, BiLogoTiktok, BiMailSend} from "react-icons/bi";
@@ -29,6 +29,7 @@ export default function NewsPage() {
     const [postTitleValue, setPostTitleValue] = useState("");
     const [postContentValue, setPostContentValue] = useState("");
     const {isLoaded, user} = useUser()
+
 
     const fetchPosts = async () => {
         await fetch('/api/posts', {
@@ -132,10 +133,14 @@ export default function NewsPage() {
                     )}
                 </ModalContent>
             </Modal>
-            <div className='flex flex-col sm:flex-row items-center w-full px-6'>
-                <h1 className="sm:hidden mb-5 title w-2/6 text-center">Hírek</h1>
+            <div className='flex flex-col sm:flex-row  w-11/12'>
+                <h1 className="sm:hidden mb-5 title w-full sm:w-2/6 text-center">Hírek</h1>
                 <div className="flex flex-col sm:flex-row w-full sm:w-2/6 mb-3 sm:mb-0">
-                    <div className="w-auto sm:w-auto">
+                    <div className="w-auto flex flex-col sm:mb-3">
+                        <div className="flex flex-row gap-1 items-center my-2 sm:mt-8">
+                            <Image radius="full" alt="saly_hun" src="/saly_hun.jpg" width={40}></Image>
+                            <p className="text-gray-600">A <span className="italic">Supporters of Alternative Learning for Youth</span> együttműködésével</p>
+                        </div>
                         <CheckboxGroup
                             color="primary"
                             defaultValue={["tiktok", "instagram", "levelek"]}
@@ -169,7 +174,7 @@ export default function NewsPage() {
                 <h1 className="hidden sm:block m-5 title w-2/6 text-center">Hírek</h1>
                 <div className="w-1/6"></div>
                 {isLoaded && user && user.publicMetadata.role === "admin" && (
-                <div className="hidden sm:block w-1/6 text-right">
+                <div className="hidden sm:block w-1/6 text-right self-end mb-4">
                     <Button color="primary" radius="full" variant="ghost"
                             onPress={onOpen} startContent={<BiMailSend size="1.5em" />}>
                         <p className='kanit-semibold text-large'>Új hírt közlök</p>

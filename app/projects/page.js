@@ -91,8 +91,8 @@ export default function ProjectsPage() {
     const [filteredProjects, setFilteredProjects] = useState([])
     const [createdProject, setCreatedProject] = useState({
         title: "",
-        startDate: "",
-        endDate: "",
+        startDate: new Date(),
+        endDate: new Date(),
         country: "",
         location: "",
         organization: "",
@@ -362,6 +362,38 @@ export default function ProjectsPage() {
                                     {country.label}
                                 </AutocompleteItem>}
                             </Autocomplete>
+                            <Input
+                                isClearable
+                                variant="underlined"
+                                color="primary"
+                                value={createdProject.location}
+                                onValueChange={(value) => setCreatedProject({
+                                    ...createdProject,
+                                    location: value
+                                })}
+                                label="Város"
+                            >
+                            </Input>
+                            <iframe className="mt-2" width="300" height="300"
+                                    style={{border: '0'}}
+                                    loading="lazy"
+                                    allowFullScreen
+                                    src={`https://www.google.com/maps/embed/v1/place?q=${createdProject.location},${createdProject.country}&key=AIzaSyBQpb-zeHME6F8U4pDQIMpZ3gx3ScgnfuE`}>
+                            </iframe>
+                            <RangeCalendar
+                                calendarWidth={300}
+                                color="primary"
+                                value={{
+                                    start: parseDate(new Date(createdProject.startDate).toISOString().split('T')[0]),
+                                    end: parseDate(new Date(createdProject.endDate).toISOString().split('T')[0])
+                                }}
+                                onChange={(value) => setCreatedProject({
+                                    ...createdProject,
+                                    startDate: new Date(value.start),
+                                    endDate: new Date(value.end)
+                                })}
+                            />
+
 
                             <div className="flex flex-row gap-2 justify-end">
                                 <Button variant="ghost" color="primary" radius="full"

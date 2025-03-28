@@ -137,9 +137,9 @@ export default function NewsPage() {
                 <h1 className="sm:hidden mb-5 title w-full sm:w-2/6 text-center">Hírek</h1>
                 <div className="flex flex-col sm:flex-row w-full sm:w-2/6 mb-3 sm:mb-0">
                     <div className="w-auto flex flex-col sm:mb-3">
-                        <div className="flex flex-row gap-1 items-center my-2 sm:mt-8">
-                            <Image radius="full" alt="saly_hun" src="/saly_hun.jpg" width={40}></Image>
-                            <p className="text-gray-600">A <span className="italic">Supporters of Alternative Learning for Youth</span> együttműködésével</p>
+                        <div className="flex flex-row gap-2 items-center my-2 sm:mt-8">
+                            <Image radius="full" alt="saly_hun" src="/saly_hun.jpg" width={50}></Image>
+                            <p className="text-gray-600">A <span className="italic">Supporters of Alternative Learning for Youth Hungary</span> együttműködésével</p>
                         </div>
                         <CheckboxGroup
                             color="primary"

@@ -27,12 +27,14 @@ import {
     BiSolidXCircle
 } from "react-icons/bi";
 import {router} from "next/client";
+import {useRouter} from "next/navigation";
 
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 countries.registerLocale(require("i18n-iso-countries/langs/hu.json"));
 
 export default function ProjectPage({params}) {
 
+    const [projects, setProjects] = useState([])
     const [id, setId] = useState(null);
     const [project, setProject] = useState(null);
     const [isProjectLoaded, setIsProjectLoaded] = useState(false);
@@ -43,13 +45,42 @@ export default function ProjectPage({params}) {
     const [users, setUsers] = useState([]);
     const [participants, setParticipants] = useState([]);
     const [participantValue, setParticipantValue] = useState({id: null, name: ''});
+    const [organizationValue, setOrganizationValue] = useState({id: null, name: ''});
     const {isLoaded, user} = useUser()
     const [isButtonsDisabled, setIsButtonsDisabled] = useState(false);
+    const [uniqueOrganizations, setUniqueOrganizations] = useState([]);
     const {
         isOpen: isDeletionConfirmationModalOpen,
         onOpen: onDeletionConfirmationModalOpen,
         onClose: onDeletionConfirmationModalClose
     } = useDisclosure();
+
+    const router = useRouter()
+
+    const fetchProjects = async () => {
+        await fetch('/api/projectsapi', {
+            method: 'GET'
+        })
+            .then(response => response.json())
+            .then(projects => {
+                setProjects(projects)
+                setUniqueOrganizations([...new Set(projects
+                    .map(project => project.organization)
+                    .filter(organization => organization !== null)
+                )]);
+            })
+            .catch(error => {
+                console.error('Error fetching projects:', error)
+            });
+    }
+
+    useEffect(() => {
+        console.log(uniqueOrganizations);
+    }, [uniqueOrganizations]);
+
+    useEffect(() => {
+        fetchProjects()
+    }, []);
 
     const europeanFeatures = worldMap.features.filter(
         feature => feature.properties.continent === 'Europe'
@@ -158,6 +189,10 @@ export default function ProjectPage({params}) {
             });
     }
 
+    useEffect(() => {
+        console.log(project)
+    }, [project]);
+
 
     return (
         <>
@@ -245,6 +280,7 @@ export default function ProjectPage({params}) {
                                     <Input
                                         variant="underlined"
                                         color="primary"
+                                        label="Cím"
                                         size="lg"
                                         isClearable
                                         value={project.title}
@@ -256,6 +292,8 @@ export default function ProjectPage({params}) {
                                         fullWidth={false}
                                     ></Input>
                                     <Select
+                                        isRequired
+                                        label="Típus"
                                         errorMessage={projectType.size > 0 || !touched ? "" : "Választanod kell egy projekt típust!"}
                                         isInvalid={projectType.size > 0 || !touched ? false : true}
                                         onClose={() => setTouched(true)}
@@ -272,6 +310,42 @@ export default function ProjectPage({params}) {
                                             <SelectItem key={type.key}>{type.label}</SelectItem>
                                         ))}
                                     </Select>
+                                    <Autocomplete
+                                        defaultItems={ uniqueOrganizations.map(org => ({
+                                            key: org,
+                                            label: org
+                                        }))}
+                                        allowsCustomValue
+                                        label="Egyesület"
+                                        color="primary"
+                                        variant="underlined"
+                                        selectedKey={null}
+                                        inputValue={organizationValue.name}
+                                        onInputChange={(value) => setOrganizationValue({
+                                            ...organizationValue,
+                                            id: null,
+                                            name: value
+                                        })}
+                                        onKeyUp={(e) => {
+                                            e.continuePropagation()
+                                            if (e.key === 'Enter') {
+                                                setProject({...project, organization: organizationValue.name});
+                                                setUniqueOrganizations([...uniqueOrganizations, organizationValue.name]);
+                                            }
+                                        }}
+                                        onSelectionChange={(key, label) => {
+                                            const orga = key ? uniqueOrganizations.find(org => org === key) : null;
+                                            console.log(orga)
+                                            if (orga) {
+                                                setProject({...project, organization: orga});
+                                                setOrganizationValue({id: orga, name: orga});
+                                            }
+                                        }}
+                                    >
+                                        {(org) => <AutocompleteItem key={org.key}>
+                                            {org.label}
+                                        </AutocompleteItem>}
+                                    </Autocomplete>
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <div className="flex flex-col gap-2 flex-grow !w-full">
@@ -279,12 +353,12 @@ export default function ProjectPage({params}) {
                                             <div>
                                                 <div className="flex flex-col gap-2 ">
                                                     <Autocomplete
+                                                        isRequired
                                                         errorMessage={project.country && project.country.length > 0 || !touched ? "" : "Választanod kell egy országot!"}
                                                         isInvalid={project.country && project.country.length > 0 || !touched ? false : true}
                                                         onClose={() => setTouched(true)}
                                                         defaultItems={europeanCountries}
                                                         label="Ország"
-                                                        placeholder="Adj meg egy országot"
                                                         color="primary"
                                                         variant="underlined"
                                                         defaultSelectedKey={project.country ? countries.getAlpha2Code(project.country, 'hu').toLowerCase() : null}
@@ -353,7 +427,6 @@ export default function ProjectPage({params}) {
                                                 />
                                             </div>
                                         </div>
-                                        <p>{project.organization}</p>
                                     </div>
                                     <div className="flex flex-col gap-2 w-full sm:w-1/2">
                                         <div className="flex flex-row gap-2 w-full justify-end">
@@ -440,7 +513,7 @@ export default function ProjectPage({params}) {
                             <Card className="p-4 flex flex-col gap-2 w-fit">
                                 <div className="">
                                     <h1 className="kanit-bold text-4xl text-center mt-2">{project.title}</h1>
-                                    <p className="text-gray-700 text-xl text-center">{project.type}</p>
+                                    <p className="mb-3 text-gray-700 text-xl text-center">{project.type}</p>
                                     <p>{project.organization}</p>
                                 </div>
 

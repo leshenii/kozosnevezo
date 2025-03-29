@@ -23,7 +23,7 @@ import {
     Input,
     Select,
     SelectItem,
-    RangeCalendar, Chip
+    RangeCalendar
 } from "@heroui/react";
 import gregorian_hu from "../lib/gregorian_hu";
 import {
@@ -43,7 +43,9 @@ import countries from 'i18n-iso-countries';
 import {parseDate} from "@internationalized/date";
 import {BiSolidAddToQueue, BiSolidErrorCircle, BiSolidUser, BiSolidXCircle} from "react-icons/bi";
 import {TbHandClick} from "react-icons/tb";
+import { registerLicense } from '@syncfusion/ej2-base';
 
+registerLicense(process.env.NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY);
 
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 countries.registerLocale(require("i18n-iso-countries/langs/hu.json"));
@@ -69,11 +71,7 @@ export default function ProjectsPage() {
         features: europeanFeatures
     };
 
-    const projectTypes = [
-        {key: "youth_exchange", label: "Youth Exchange"},
-        {key: "training_course", label: "Training Course"},
-        {key: "advanced_planning_visit", label: "Advanced Planning Visit"},
-    ];
+    const projectTypes = ["Youth Exchange", "Training Course", "Advanced Planning Visit"];
 
     const searchParams = useSearchParams()
 
@@ -96,10 +94,12 @@ export default function ProjectsPage() {
         country: "",
         location: "",
         organization: "",
-        type: new Set(["youth_exchange"])
+        type: ""
     });
     const {isOpen: isCreationModalOpen, onOpen: onCreationModalOpen, onClose: onCreationModalClose} = useDisclosure();
     const [touched, setTouched] = useState(false);
+    const [uniqueOrganizations, setUniqueOrganizations] = useState([]);
+    const [organizationValue, setOrganizationValue] = useState({id: null, name: ''});
 
     const shapeSelected = (args) => {
 
@@ -171,6 +171,10 @@ export default function ProjectsPage() {
             .then(response => response.json())
             .then(projects => {
                 setProjects(projects)
+                setUniqueOrganizations([...new Set(projects
+                    .map(project => project.organization)
+                    .filter(organization => organization !== null)
+                )]);
                 const intervals = projects.map(project => [
                     new DateObject().set({
                         year: new Date(project.startDate).getFullYear(),
@@ -283,7 +287,7 @@ export default function ProjectsPage() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({createdProject})
+            body: JSON.stringify({...createdProject})
         })
             .then(response => response.json())
             .then(createdProject => {
@@ -300,7 +304,7 @@ export default function ProjectsPage() {
 
     return (
         <>
-            <Modal isOpen={isCreationModalOpen} size="lg" onClose={onCreationModalClose}>
+            <Modal isOpen={isCreationModalOpen} size="lg" onClose={onCreationModalClose} scrollBehavior="outside" backdrop="blur" isDismissable={false}>
                 <ModalContent>
                     {(onClose) => (
                         <ModalBody className="">
@@ -314,34 +318,73 @@ export default function ProjectsPage() {
                                 onValueChange={(value) => setCreatedProject({...createdProject, title: value})}
                                 classNames={{
                                     input: "kanit-bold text-4xl text-center mt-2",
-                                    mainWrapper: "w-full sm:w-fit self-center sm:mt-2 sm:pl-6"
+                                    mainWrapper: "w-full self-center sm:mt-2 "
                                 }}
                                 fullWidth={false}
                             ></Input>
                             <Select
-                                errorMessage={createdProject.type.size > 0 || !touched ? "" : "Választanod kell egy projekt típust!"}
-                                isInvalid={createdProject.type.size > 0 || !touched ? false : true}
+                                errorMessage={createdProject.type || !touched ? "" : "Választanod kell egy projekt típust!"}
+                                isInvalid={!(createdProject.type || !touched)}
                                 onClose={() => setTouched(true)}
                                 variant="underlined"
                                 color="primary"
-                                onSelectionChange={(selected) => setCreatedProject({...createdProject, type: selected})}
-                                selectedKeys={createdProject.type}
+                                label="Típus"
+                                isRequired
+                                onSelectionChange={(selected) => setCreatedProject({...createdProject, type: selected.anchorKey})}
+                                selectedKeys={[createdProject.type]}
                                 classNames={{
                                     value: "pl-7 !text-gray-600 text-xl text-center",
-                                    mainWrapper: "w-full sm:w-1/2 self-center"
+                                    mainWrapper: "w-full self-center"
                                 }}
                             >
                                 {projectTypes.map((type) => (
-                                    <SelectItem key={type.key}>{type.label}</SelectItem>
+                                    <SelectItem key={type}>{type}</SelectItem>
                                 ))}
                             </Select>
+                            <Autocomplete
+                                defaultItems={ uniqueOrganizations.map(org => ({
+                                    key: org,
+                                    label: org
+                                }))}
+                                allowsCustomValue
+                                label="Egyesület"
+                                placeholder="Válassz egy egyesületet vagy adj meg újat"
+                                color="primary"
+                                variant="underlined"
+                                selectedKey={null}
+                                inputValue={organizationValue.name}
+                                onInputChange={(value) => setOrganizationValue({
+                                    ...organizationValue,
+                                    id: null,
+                                    name: value
+                                })}
+                                onKeyUp={(e) => {
+                                    e.continuePropagation()
+                                    if (e.key === 'Enter') {
+                                        setCreatedProject({...createdProject, organization: organizationValue.name});
+                                        setUniqueOrganizations([...uniqueOrganizations, organizationValue.name]);
+                                    }
+                                }}
+                                onSelectionChange={(key, label) => {
+                                    const orga = key ? uniqueOrganizations.find(org => org === key) : null;
+                                    console.log(orga)
+                                    if (orga) {
+                                        setCreatedProject({...createdProject, organization: orga});
+                                        setOrganizationValue({id: orga, name: orga});
+                                    }
+                                }}
+                            >
+                                {(org) => <AutocompleteItem key={org.key}>
+                                    {org.label}
+                                </AutocompleteItem>}
+                            </Autocomplete>
                             <Autocomplete
                                 errorMessage={createdProject.country && createdProject.country.length > 0 || !touched ? "" : "Választanod kell egy országot!"}
                                 isInvalid={createdProject.country && createdProject.country.length > 0 || !touched ? false : true}
                                 onClose={() => setTouched(true)}
                                 defaultItems={europeanCountries}
                                 label="Ország"
-                                placeholder="Adj meg egy országot"
+                                isRequired
                                 color="primary"
                                 variant="underlined"
                                 defaultSelectedKey={createdProject.country ? countries.getAlpha2Code(createdProject.country, 'hu').toLowerCase() : null}

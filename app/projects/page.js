@@ -23,7 +23,7 @@ import {
     Input,
     Select,
     SelectItem,
-    RangeCalendar
+    RangeCalendar, Chip
 } from "@heroui/react";
 import gregorian_hu from "../lib/gregorian_hu";
 import {
@@ -43,7 +43,11 @@ import countries from 'i18n-iso-countries';
 import {parseDate} from "@internationalized/date";
 import {BiSolidAddToQueue, BiSolidErrorCircle, BiSolidUser, BiSolidXCircle} from "react-icons/bi";
 import {TbHandClick} from "react-icons/tb";
-import { registerLicense } from '@syncfusion/ej2-base';
+import {registerLicense} from '@syncfusion/ej2-base';
+import Dropzone from 'react-dropzone'
+import {uploadFile} from "../components/UploadFile";
+import {MdPictureAsPdf} from "react-icons/md";
+import {FaFilePdf} from "react-icons/fa6";
 
 registerLicense(process.env.NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY);
 
@@ -100,6 +104,7 @@ export default function ProjectsPage() {
     const [touched, setTouched] = useState(false);
     const [uniqueOrganizations, setUniqueOrganizations] = useState([]);
     const [organizationValue, setOrganizationValue] = useState({id: null, name: ''});
+    const [formData, setFormData] = useState(new FormData());
 
     const shapeSelected = (args) => {
 
@@ -304,7 +309,8 @@ export default function ProjectsPage() {
 
     return (
         <>
-            <Modal isOpen={isCreationModalOpen} size="lg" onClose={onCreationModalClose} scrollBehavior="outside" backdrop="blur" isDismissable={false}>
+            <Modal isOpen={isCreationModalOpen} size="lg" onClose={onCreationModalClose} scrollBehavior="outside"
+                   backdrop="blur" isDismissable={false}>
                 <ModalContent>
                     {(onClose) => (
                         <ModalBody className="">
@@ -313,7 +319,7 @@ export default function ProjectsPage() {
                                 color="primary"
                                 size="lg"
                                 isClearable
-                                placeholder="Projekt címe"
+                                label="Cím"
                                 value={createdProject.title}
                                 onValueChange={(value) => setCreatedProject({...createdProject, title: value})}
                                 classNames={{
@@ -330,7 +336,10 @@ export default function ProjectsPage() {
                                 color="primary"
                                 label="Típus"
                                 isRequired
-                                onSelectionChange={(selected) => setCreatedProject({...createdProject, type: selected.anchorKey})}
+                                onSelectionChange={(selected) => setCreatedProject({
+                                    ...createdProject,
+                                    type: selected.anchorKey
+                                })}
                                 selectedKeys={[createdProject.type]}
                                 classNames={{
                                     value: "pl-7 !text-gray-600 text-xl text-center",
@@ -342,7 +351,7 @@ export default function ProjectsPage() {
                                 ))}
                             </Select>
                             <Autocomplete
-                                defaultItems={ uniqueOrganizations.map(org => ({
+                                defaultItems={uniqueOrganizations.map(org => ({
                                     key: org,
                                     label: org
                                 }))}
@@ -436,7 +445,29 @@ export default function ProjectsPage() {
                                     endDate: new Date(value.end)
                                 })}
                             />
-
+                            <Dropzone onDrop={acceptedFiles => {
+                                const randomCode = Math.floor(1000000 + Math.random() * 9000000); // Generate a 7-digit random number
+                                const file = acceptedFiles[0];
+                                const fileNameParts = file.name.split('.');
+                                const newFileName = `${fileNameParts[0]}_${randomCode}.${fileNameParts[1]}`;
+                                const newFile = new File([file], newFileName, {type: file.type});
+                                formData.append("file", newFile);
+                                setCreatedProject({...createdProject, infopack: newFile.name});
+                            }}>
+                                {({getRootProps, getInputProps}) => (
+                                    <section>
+                                        <div {...getRootProps()}
+                                             className="border-3 border-blue-800 h-[10rem] rounded-xl cursor-pointer flex flex-col gap-2 justify-center items-center">
+                                            <input {...getInputProps()} />
+                                            <p className="text-gray-700">Húzd ide a pdf fájlt, vagy kattints ide és
+                                                tallózd ki</p>
+                                            <MdPictureAsPdf size="2em" className="text-gray-500"/>
+                                        </div>
+                                    </section>
+                                )}
+                            </Dropzone>
+                            {createdProject.infopack && <Chip className="pl-3" startContent={<FaFilePdf/>}
+                                                              color="primary">{createdProject.infopack}</Chip>}
 
                             <div className="flex flex-row gap-2 justify-end">
                                 <Button variant="ghost" color="primary" radius="full"
@@ -444,8 +475,10 @@ export default function ProjectsPage() {
                                     Mégse
                                 </Button>
                                 <Button variant="ghost" color="success" radius="full" onPress={() => {
-                                    createProject()
-                                    onCreationModalClose()
+                                    uploadFile(formData).then(r =>
+                                        createProject().then(() => {
+                                            window.location.reload();
+                                        }));
                                 }}>
                                     Mentés
                                 </Button>

@@ -303,9 +303,19 @@ export default function ProjectsPage() {
             });
     };
 
-    useEffect(() => {
-        console.log(createdProject);
-    }, [createdProject]);
+    const handleDelete = async (fileName) => {
+        try {
+            const response = await fetch(`/api/projectsapi/project/infopack?fileName=${fileName}`, {method: 'DELETE'});
+            if (response.ok) {
+                console.log("File deleted successfully");
+                setCreatedProject({...createdProject, infopack: null});
+            } else {
+                console.error("Error deleting file");
+            }
+        } catch (error) {
+            console.error("Error deleting file:", error);
+        }
+    };
 
     return (
         <>
@@ -466,8 +476,16 @@ export default function ProjectsPage() {
                                     </section>
                                 )}
                             </Dropzone>
-                            {createdProject.infopack && <Chip className="pl-3" startContent={<FaFilePdf/>}
-                                                              color="primary">{createdProject.infopack}</Chip>}
+                            {createdProject.infopack &&
+                                <div className="flex flex-row gap-2">
+                                    <Chip className="pl-3" startContent={<FaFilePdf/>}
+                                          color="primary">{createdProject.infopack}</Chip>
+                                    <Chip onClick={() => setCreatedProject({...createdProject, infopack: null})}
+                                          className="pl-3 cursor-pointer" startContent={<BiSolidXCircle/>}
+                                          color="danger">Törlés</Chip>
+                                </div>
+
+                            }
 
                             <div className="flex flex-row gap-2 justify-end">
                                 <Button variant="ghost" color="primary" radius="full"
@@ -475,10 +493,10 @@ export default function ProjectsPage() {
                                     Mégse
                                 </Button>
                                 <Button variant="ghost" color="success" radius="full" onPress={() => {
-                                    uploadFile(formData).then(r =>
-                                        createProject().then(() => {
-                                            window.location.reload();
-                                        }));
+                                    if (createdProject.infopack) uploadFile(formData)
+                                    createProject().then(() => {
+                                        window.location.reload();
+                                    });
                                 }}>
                                     Mentés
                                 </Button>
@@ -509,143 +527,150 @@ export default function ProjectsPage() {
                                 </Button>
                             </div>
                         </div>
-                        {selectedView === "calendar" && (
-                            <Calendar
-                                value={projectIntervals}
-                                onChange={setProjectIntervals}
-                                readOnly={true}
-                                multiple
-                                range
-                                weekStartDayIndex={1}
-                                locale={gregorian_hu}
-                                currentDate={new DateObject()}
-                                mapDays={mapDays}
-                                className="mx-auto"
-                                numberOfMonths={window.innerWidth < 640 ? 1 : 3}
-                            />
-                        )}
-                        {selectedView === "map" && (
-                            <div className="w-[95vw] md:w-[70vw] h-[70vh] md:h-[90vh] mb-12">
-                                <MapsComponent id="maps" tooltipRender={tooltipRender} loaded={onMapsLoad} load={load}
-                                               itemSelection={shapeSelected}
-                                               background='#F2F2F2'
-                                               zoomSettings={{enable: false}} height="100%" width="100%" mapsArea={{
-                                    background: '#F2F2F2',
-                                    border: {
-                                        width: 0,
-                                        color: '#F2F2F2'
-                                    }
-                                }}>
-                                    <Inject services={[MapsTooltip, Selection]}/>
-                                    <LayersDirective>
-                                        <LayerDirective shapeData={filteredGeoJson} shapePropertyPath='name'
-                                                        shapeDataPath='name' dataSource={datasource} tooltipSettings={{
-                                            visible: true,
-                                            valuePath: 'name',
-                                            template: template
-                                        }} shapeSettings={shapeSetting} selectionSettings={{
-                                            enable: true,
-                                            fill: 'black',
-                                        }}/>
-                                    </LayersDirective>
-                                </MapsComponent>
-                            </div>
-                        )}
-                        {selectedView === "filter" && (
-                            <div className="flex flex-col gap-4">
-                                <div className="flex flex-col sm:flex-row gap-4 items-center" id="filter">
-                                    <Autocomplete
-                                        defaultItems={countriesLocal}
-                                        label="Ország"
-                                        placeholder="Keress ország szerint"
-                                        color="primary"
-                                        variant="bordered"
-                                        defaultSelectedKey={selectedCountry || null}
-                                        onSelectionChange={(selected) => setSelectedCountry(selected)}
-                                        fullWidth
-                                    >
-                                        {(country) => <AutocompleteItem key={country.key} startContent={
-                                            <Avatar alt="flag" className="w-6 h-6"
-                                                    src={`https://flagcdn.com/${snakeCase(country.key)}.svg`}/>
-                                        }>
-                                            {country.label}
-                                        </AutocompleteItem>}
-                                    </Autocomplete>
-                                    <Autocomplete
-                                        defaultItems={types}
-                                        label="Fajták"
-                                        placeholder="Keress projekt fajta szerint"
-                                        color="primary"
-                                        variant="bordered"
-                                        defaultSelectedKey={selectedType || null}
-                                        onSelectionChange={(selected) => setSelectedType(selected)}
-                                        fullWidth
-                                    >
-                                        {(type) => <AutocompleteItem key={type.key}>{type.label}</AutocompleteItem>}
-                                    </Autocomplete>
-                                    <Autocomplete
-                                        defaultItems={organizations}
-                                        label="Egyesület"
-                                        placeholder="Keress egyesület szerint"
-                                        color="primary"
-                                        variant="bordered"
-                                        defaultSelectedKey={selectedOrganization || null}
-                                        onSelectionChange={(selected) => setSelectedOrganization(selected)}
-                                        fullWidth
-                                    >
-                                        {(organization) => <AutocompleteItem
-                                            key={organization.key}>{organization.label}</AutocompleteItem>}
-                                    </Autocomplete>
+                        {
+                            selectedView === "calendar" && (
+                                <Calendar
+                                    value={projectIntervals}
+                                    onChange={setProjectIntervals}
+                                    readOnly={true}
+                                    multiple
+                                    range
+                                    weekStartDayIndex={1}
+                                    locale={gregorian_hu}
+                                    currentDate={new DateObject()}
+                                    mapDays={mapDays}
+                                    className="mx-auto"
+                                    numberOfMonths={window.innerWidth < 640 ? 1 : 3}
+                                />
+                            )
+                        }
+                        {
+                            selectedView === "map" && (
+                                <div className="w-[95vw] md:w-[70vw] h-[70vh] md:h-[90vh] mb-12">
+                                    <MapsComponent id="maps" tooltipRender={tooltipRender} loaded={onMapsLoad} load={load}
+                                                   itemSelection={shapeSelected}
+                                                   background='#F2F2F2'
+                                                   zoomSettings={{enable: false}} height="100%" width="100%" mapsArea={{
+                                        background: '#F2F2F2',
+                                        border: {
+                                            width: 0,
+                                            color: '#F2F2F2'
+                                        }
+                                    }}>
+                                        <Inject services={[MapsTooltip, Selection]}/>
+                                        <LayersDirective>
+                                            <LayerDirective shapeData={filteredGeoJson} shapePropertyPath='name'
+                                                            shapeDataPath='name' dataSource={datasource} tooltipSettings={{
+                                                visible: true,
+                                                valuePath: 'name',
+                                                template: template
+                                            }} shapeSettings={shapeSetting} selectionSettings={{
+                                                enable: true,
+                                                fill: 'black',
+                                            }}/>
+                                        </LayersDirective>
+                                    </MapsComponent>
                                 </div>
-                                <div className="flex flex-col gap-3 mb-14">
-                                    {filteredProjects.length === 0 ? (
-                                            <p className="text-center mt-14 text-gray-700">Ilyen feltételekkel nincs
-                                                rögzített projektünk!</p>
-                                        ) :
-                                        filteredProjects.map(project => (
-                                            <Card key={project.id} isPressable
-                                                  onPress={() => redirect(`/projects/${project.id}`)}>
-                                                <CardBody>
-                                                    <div className="flex flex-row">
-                                                        <div className="flex flex-col w-3/5 sm:w-1/2">
-                                                            <h2 className="kanit-bold text-xl">{project.title}</h2>
-                                                            <p className="text-gray-700">{project.type}</p>
-                                                            <div className="flex flex-row gap-1 text-blue-900">
-                                                                <p className=" text-sm">Részletek
-                                                                    megtekintéséhez kattints!</p>
-                                                                <TbHandClick/>
-                                                            </div>
+                            )
+                        }
+                        {
+                            selectedView === "filter" && (
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-col sm:flex-row gap-4 items-center" id="filter">
+                                        <Autocomplete
+                                            defaultItems={countriesLocal}
+                                            label="Ország"
+                                            placeholder="Keress ország szerint"
+                                            color="primary"
+                                            variant="bordered"
+                                            defaultSelectedKey={selectedCountry || null}
+                                            onSelectionChange={(selected) => setSelectedCountry(selected)}
+                                            fullWidth
+                                        >
+                                            {(country) => <AutocompleteItem key={country.key} startContent={
+                                                <Avatar alt="flag" className="w-6 h-6"
+                                                        src={`https://flagcdn.com/${snakeCase(country.key)}.svg`}/>
+                                            }>
+                                                {country.label}
+                                            </AutocompleteItem>}
+                                        </Autocomplete>
+                                        <Autocomplete
+                                            defaultItems={types}
+                                            label="Fajták"
+                                            placeholder="Keress projekt fajta szerint"
+                                            color="primary"
+                                            variant="bordered"
+                                            defaultSelectedKey={selectedType || null}
+                                            onSelectionChange={(selected) => setSelectedType(selected)}
+                                            fullWidth
+                                        >
+                                            {(type) => <AutocompleteItem key={type.key}>{type.label}</AutocompleteItem>}
+                                        </Autocomplete>
+                                        <Autocomplete
+                                            defaultItems={organizations}
+                                            label="Egyesület"
+                                            placeholder="Keress egyesület szerint"
+                                            color="primary"
+                                            variant="bordered"
+                                            defaultSelectedKey={selectedOrganization || null}
+                                            onSelectionChange={(selected) => setSelectedOrganization(selected)}
+                                            fullWidth
+                                        >
+                                            {(organization) => <AutocompleteItem
+                                                key={organization.key}>{organization.label}</AutocompleteItem>}
+                                        </Autocomplete>
+                                    </div>
+                                    <div className="flex flex-col gap-3 mb-14">
+                                        {filteredProjects.length === 0 ? (
+                                                <p className="text-center mt-14 text-gray-700">Ilyen feltételekkel nincs
+                                                    rögzített projektünk!</p>
+                                            ) :
+                                            filteredProjects.map(project => (
+                                                <Card key={project.id} isPressable
+                                                      onPress={() => redirect(`/projects/${project.id}`)}>
+                                                    <CardBody>
+                                                        <div className="flex flex-row">
+                                                            <div className="flex flex-col w-3/5 sm:w-1/2">
+                                                                <h2 className="kanit-bold text-xl">{project.title}</h2>
+                                                                <p className="text-gray-700">{project.type}</p>
+                                                                <div className="flex flex-row gap-1 text-blue-900">
+                                                                    <p className=" text-sm">Részletek
+                                                                        megtekintéséhez kattints!</p>
+                                                                    <TbHandClick/>
+                                                                </div>
 
-                                                        </div>
-                                                        <div
-                                                            className="flex flex-col items-end text-end w-2/5 sm:w-1/2">
-                                                            <p>{new Date(project.startDate).toLocaleDateString('hu-HU', {
-                                                                year: 'numeric',
-                                                                month: 'short',
-                                                                day: 'numeric'
-                                                            })} - {new Date(project.endDate).toLocaleDateString('hu-HU', {
-                                                                year: 'numeric',
-                                                                month: 'long',
-                                                                day: 'numeric'
-                                                            })}</p>
-                                                            <div className="flex flex-row gap-2">
-                                                                <p>{project.country}</p>
-                                                                <Avatar alt="flag" className="w-6 h-6"
-                                                                        src={`https://flagcdn.com/${snakeCase(countries.getAlpha2Code(project.country, 'hu'))}.svg`}/>
                                                             </div>
-                                                            <p>{project.organization}</p>
+                                                            <div
+                                                                className="flex flex-col items-end text-end w-2/5 sm:w-1/2">
+                                                                <p>{new Date(project.startDate).toLocaleDateString('hu-HU', {
+                                                                    year: 'numeric',
+                                                                    month: 'short',
+                                                                    day: 'numeric'
+                                                                })} - {new Date(project.endDate).toLocaleDateString('hu-HU', {
+                                                                    year: 'numeric',
+                                                                    month: 'long',
+                                                                    day: 'numeric'
+                                                                })}</p>
+                                                                <div className="flex flex-row gap-2">
+                                                                    <p>{project.country}</p>
+                                                                    <Avatar alt="flag" className="w-6 h-6"
+                                                                            src={`https://flagcdn.com/${snakeCase(countries.getAlpha2Code(project.country, 'hu'))}.svg`}/>
+                                                                </div>
+                                                                <p>{project.organization}</p>
 
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </CardBody>
-                                            </Card>
-                                        ))}
+                                                    </CardBody>
+                                                </Card>
+                                            ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )
+                        }
                     </>
                 }
             </div>
         </>
-    );
+    )
+        ;
 }

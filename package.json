@@ -25,6 +25,7 @@
     "@syncfusion/ej2-react-buttons": "^28.2.6",
     "@syncfusion/ej2-react-maps": "^28.2.6",
     "@tabler/icons-react": "^3.30.0",
+    "basic-ftp": "^5.0.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",

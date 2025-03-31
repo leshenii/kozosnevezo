@@ -28,6 +28,8 @@ import {
 } from "react-icons/bi";
 import {router} from "next/client";
 import {useRouter} from "next/navigation";
+import {FaFilePdf} from "react-icons/fa6";
+import {downloadFile} from "@/app/components/UploadFile";
 
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 countries.registerLocale(require("i18n-iso-countries/langs/hu.json"));
@@ -189,9 +191,35 @@ export default function ProjectPage({params}) {
             });
     }
 
-    useEffect(() => {
-        console.log(project)
-    }, [project]);
+    const handleDownload = async (fileName) => {
+        try {
+            const response = await fetch(`/api/projectsapi/project/infopack?fileName=${fileName}`, {method: 'GET'});
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        } catch (error) {
+            console.error("Error downloading file:", error);
+        }
+    };
+
+    const handleDelete = async (fileName) => {
+        try {
+            const response = await fetch(`/api/projectsapi/project/infopack?fileName=${fileName}`, {method: 'DELETE'});
+            if (response.ok) {
+                console.log("File deleted successfully");
+                setProject({...project, infopack: null});
+            } else {
+                console.error("Error deleting file");
+            }
+        } catch (error) {
+            console.error("Error deleting file:", error);
+        }
+    };
 
 
     return (
@@ -311,7 +339,7 @@ export default function ProjectPage({params}) {
                                         ))}
                                     </Select>
                                     <Autocomplete
-                                        defaultItems={ uniqueOrganizations.map(org => ({
+                                        defaultItems={uniqueOrganizations.map(org => ({
                                             key: org,
                                             label: org
                                         }))}
@@ -428,6 +456,18 @@ export default function ProjectPage({params}) {
                                             </div>
                                         </div>
                                     </div>
+                                    {project.infopack &&
+                                        <div className="flex flex-row gap-2">
+                                            <Chip className="pl-3 cursor-pointer"
+                                                  onClick={() => handleDownload(project.infopack)}
+                                                  startContent={<FaFilePdf/>} color="primary">
+                                                {project.infopack}
+                                            </Chip>
+                                            <Chip onClick={() => handleDelete(project.infopack)}
+                                                  className="pl-3 cursor-pointer" startContent={<BiSolidXCircle/>}
+                                                  color="danger">Törlés</Chip>
+                                        </div>
+                                    }
                                     <div className="flex flex-col gap-2 w-full sm:w-1/2">
                                         <div className="flex flex-row gap-2 w-full justify-end">
                                             <div
@@ -552,6 +592,13 @@ export default function ProjectPage({params}) {
                                             />
                                         </div>
                                     </div>
+                                    {project.infopack &&
+                                        <Chip className="pl-3 cursor-pointer"
+                                              onClick={() => handleDownload(project.infopack)}
+                                              startContent={<FaFilePdf/>} color="primary">
+                                            {project.infopack}
+                                        </Chip>
+                                    }
                                     <div className="flex flex-col gap-2 flex-gorw min-w-1/2 w-full">
                                         <div className="border-solid border-0 border-l-[3px] border-blue-900">
                                             <h2 className="kanit-semibold text-xl ml-2 text-gray-800">Csapatvezető</h2>

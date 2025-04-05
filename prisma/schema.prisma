@@ -27,19 +27,20 @@ model SitePost {
 }
 
 model Project {
-  id           Int                  @id @default(autoincrement())
-  type         String
-  title        String?
-  country      String
-  location     String?
-  startDate    DateTime
-  endDate      DateTime
-  description  String?
-  participants ProjectParticipant[]
-  teamLeader   User?                @relation("ProjectTeamLeader", fields: [leaderId], references: [id])
-  leaderId     Int?
-  infopack     String?
-  organization String?
+  id                   Int                  @id @default(autoincrement())
+  type                 String
+  title                String?
+  country              String
+  location             String?
+  startDate            DateTime
+  endDate              DateTime
+  description          String?
+  participants         ProjectParticipant[]
+  teamLeader           User?                @relation("ProjectTeamLeader", fields: [leaderId], references: [id])
+  leaderId             Int?
+  infopack             String?
+  organization         String?
+  numberOfParticipants Int?
 }
 
 model User {

@@ -4,7 +4,13 @@ import * as ftp from "basic-ftp";
 import { Readable, Writable } from "stream";
 
 export async function uploadFile(formData) {
-    const file = formData.get("file");
+    let lastFile = null;
+    for (const [name, value] of formData.entries()) {
+        if (name === "file") {
+            lastFile = value;
+        }
+    }
+    const file = lastFile;
     const arrayBuffer = await file.arrayBuffer();
     const buffer = new Uint8Array(arrayBuffer);
 
@@ -20,7 +26,7 @@ export async function uploadFile(formData) {
         });
 
         const readableStream = new Readable();
-        readableStream._read = () => {}; // _read is required but you can noop it
+        readableStream._read = () => {};
         readableStream.push(buffer);
         readableStream.push(null);
 

@@ -456,7 +456,7 @@ export default function ProjectsPage() {
                                 })}
                             />
                             <Dropzone onDrop={acceptedFiles => {
-                                const randomCode = Math.floor(1000000 + Math.random() * 9000000); // Generate a 7-digit random number
+                                const randomCode = Math.floor(1000000 + Math.random() * 9000000);
                                 const file = acceptedFiles[0];
                                 const fileNameParts = file.name.split('.');
                                 const newFileName = `${fileNameParts[0]}_${randomCode}.${fileNameParts[1]}`;
@@ -480,7 +480,10 @@ export default function ProjectsPage() {
                                 <div className="flex flex-row gap-2">
                                     <Chip className="pl-3" startContent={<FaFilePdf/>}
                                           color="primary">{createdProject.infopack}</Chip>
-                                    <Chip onClick={() => setCreatedProject({...createdProject, infopack: null})}
+                                    <Chip onClick={() => {
+                                        setCreatedProject({...createdProject, infopack: null})
+                                        setFormData(new FormData());
+                                    }}
                                           className="pl-3 cursor-pointer" startContent={<BiSolidXCircle/>}
                                           color="danger">Törlés</Chip>
                                 </div>

@@ -469,7 +469,8 @@ export default function ProjectPage({params}) {
                                         </div>
                                     }
                                     <div className="flex flex-col gap-2 w-full sm:w-1/2">
-                                        <div className="flex flex-row gap-2 w-full justify-end">
+                                        {/*<div className="flex flex-row gap-2 w-full justify-end">
+
                                             <div
                                                 className="border-solid border-0 border-l-[3px] border-blue-900 justify-self-start flex-grow ">
                                                 <h2 className="kanit-semibold text-xl ml-2 text-gray-800">Csapatvezető</h2>
@@ -482,7 +483,7 @@ export default function ProjectPage({params}) {
                                             >
                                                 Hozzáadás
                                             </Button>
-                                        </div>
+                                        </div>*/}
                                         <div className="flex flex-row gap-2 w-full justify-end">
                                             <div
                                                 className="border-solid border-0 border-l-[3px] border-blue-900 justify-self-start flex-grow ">

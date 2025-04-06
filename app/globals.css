@@ -4,12 +4,30 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+html, body {
   font-family: 'Inter', 'Kanit', Arial, Helvetica, sans-serif;
 }
 
-.h-screen-minus-navbar {
-  @apply h-[calc(100vh-150px)];
+.h-screen-minus-navbar-desktop {
+  height: calc(100vh - 104px);
+}
+
+.h-screen-minus-navbar-mobile {
+  height: calc(100vh - 190px);
+}
+
+/* Apply .h-screen-minus-navbar-mobile on small devices */
+@media (max-width: 640px) {
+  .responsive-height {
+    min-height: calc(100vh - 190px);
+  }
+}
+
+/* Apply .h-screen-minus-navbar on medium and large devices */
+@media (min-width: 641px) {
+  .responsive-height {
+    min-height: calc(100vh - 104px);
+  }
 }
 
 .kanit-regular {
@@ -32,13 +50,6 @@ body {
   font-weight: 700;
   @apply text-6xl;
 }
-
-.cl-avatarBox {
-  width: 2.75rem;
-  height: 2.75rem;
-}
-
-
 
 .fab-right {
   margin: 0px;

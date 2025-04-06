@@ -23,7 +23,7 @@ import {
     Input,
     Select,
     SelectItem,
-    RangeCalendar, Chip
+    RangeCalendar, Chip, addToast
 } from "@heroui/react";
 import gregorian_hu from "../lib/gregorian_hu";
 import {
@@ -48,6 +48,9 @@ import Dropzone from 'react-dropzone'
 import {uploadFile} from "../components/UploadFile";
 import {MdPictureAsPdf} from "react-icons/md";
 import {FaFilePdf} from "react-icons/fa6";
+import {upload} from '@vercel/blob/client';
+import {head} from "@vercel/blob";
+import {FaCalendarWeek} from "react-icons/fa";
 
 registerLicense(process.env.NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY);
 
@@ -101,10 +104,12 @@ export default function ProjectsPage() {
         type: ""
     });
     const {isOpen: isCreationModalOpen, onOpen: onCreationModalOpen, onClose: onCreationModalClose} = useDisclosure();
-    const [touched, setTouched] = useState(false);
+    const [typeTouched, setTypeTouched] = useState(false);
+    const [countryTouched, setCountryTouched] = useState(false);
     const [uniqueOrganizations, setUniqueOrganizations] = useState([]);
     const [organizationValue, setOrganizationValue] = useState({id: null, name: ''});
-    const [formData, setFormData] = useState(new FormData());
+    const [blob, setBlob] = useState(null);
+    const [uploading, setUploading] = useState(false);
 
     const shapeSelected = (args) => {
 
@@ -296,26 +301,15 @@ export default function ProjectsPage() {
         })
             .then(response => response.json())
             .then(createdProject => {
-
             })
             .catch(error => {
                 console.error('Error creating project:', error);
             });
     };
 
-    const handleDelete = async (fileName) => {
-        try {
-            const response = await fetch(`/api/projectsapi/project/infopack?fileName=${fileName}`, {method: 'DELETE'});
-            if (response.ok) {
-                console.log("File deleted successfully");
-                setCreatedProject({...createdProject, infopack: null});
-            } else {
-                console.error("Error deleting file");
-            }
-        } catch (error) {
-            console.error("Error deleting file:", error);
-        }
-    };
+    useEffect(() => {
+        console.log(blob)
+    }, [blob]);
 
     return (
         <>
@@ -323,7 +317,7 @@ export default function ProjectsPage() {
                    backdrop="blur" isDismissable={false}>
                 <ModalContent>
                     {(onClose) => (
-                        <ModalBody className="">
+                        <ModalBody className="items-center">
                             <Input
                                 variant="underlined"
                                 color="primary"
@@ -339,9 +333,9 @@ export default function ProjectsPage() {
                                 fullWidth={false}
                             ></Input>
                             <Select
-                                errorMessage={createdProject.type || !touched ? "" : "Választanod kell egy projekt típust!"}
-                                isInvalid={!(createdProject.type || !touched)}
-                                onClose={() => setTouched(true)}
+                                errorMessage={createdProject.type || !typeTouched ? "" : "Választanod kell egy projekt típust!"}
+                                isInvalid={!(createdProject.type || !typeTouched)}
+                                onClose={() => setTypeTouched(true)}
                                 variant="underlined"
                                 color="primary"
                                 label="Típus"
@@ -352,7 +346,7 @@ export default function ProjectsPage() {
                                 })}
                                 selectedKeys={[createdProject.type]}
                                 classNames={{
-                                    value: "pl-7 !text-gray-600 text-xl text-center",
+                                    value: "!text-gray-600 text-xl text-center",
                                     mainWrapper: "w-full self-center"
                                 }}
                             >
@@ -398,9 +392,9 @@ export default function ProjectsPage() {
                                 </AutocompleteItem>}
                             </Autocomplete>
                             <Autocomplete
-                                errorMessage={createdProject.country && createdProject.country.length > 0 || !touched ? "" : "Választanod kell egy országot!"}
-                                isInvalid={createdProject.country && createdProject.country.length > 0 || !touched ? false : true}
-                                onClose={() => setTouched(true)}
+                                errorMessage={createdProject.country && createdProject.country.length > 0 || !countryTouched ? "" : "Választanod kell egy országot!"}
+                                isInvalid={createdProject.country && createdProject.country.length > 0 || !countryTouched ? false : true}
+                                onClose={() => setCountryTouched(true)}
                                 defaultItems={europeanCountries}
                                 label="Ország"
                                 isRequired
@@ -436,38 +430,62 @@ export default function ProjectsPage() {
                                 label="Város"
                             >
                             </Input>
-                            <iframe className="mt-2" width="300" height="300"
+                            <iframe className="mt-2" width="100%" height="300"
                                     style={{border: '0'}}
                                     loading="lazy"
                                     allowFullScreen
                                     src={`https://www.google.com/maps/embed/v1/place?q=${createdProject.location},${createdProject.country}&key=AIzaSyBQpb-zeHME6F8U4pDQIMpZ3gx3ScgnfuE`}>
                             </iframe>
-                            <RangeCalendar
-                                calendarWidth={300}
-                                color="primary"
-                                value={{
-                                    start: parseDate(new Date(createdProject.startDate).toISOString().split('T')[0]),
-                                    end: parseDate(new Date(createdProject.endDate).toISOString().split('T')[0])
-                                }}
-                                onChange={(value) => setCreatedProject({
-                                    ...createdProject,
-                                    startDate: new Date(value.start),
-                                    endDate: new Date(value.end)
-                                })}
-                            />
-                            <Dropzone onDrop={acceptedFiles => {
-                                const randomCode = Math.floor(1000000 + Math.random() * 9000000);
+                            <div className="flex flex-row self-start">
+                                <RangeCalendar
+                                    calendarWidth={300}
+                                    color="primary"
+                                    value={{
+                                        start: parseDate(new Date(createdProject.startDate).toISOString().split('T')[0]),
+                                        end: parseDate(new Date(createdProject.endDate).toISOString().split('T')[0])
+                                    }}
+                                    onChange={(value) => setCreatedProject({
+                                        ...createdProject,
+                                        startDate: new Date(value.start),
+                                        endDate: new Date(value.end)
+                                    })}
+                                />
+                                {createdProject.startDate && createdProject.endDate &&
+                                    <div className="flex flex-col text-center ml-5 items-center justify-center">
+                                        <FaCalendarWeek className="text-gray-700" />
+                                        <span className="text-gray-700 leading-4 pt-1">{new Date(createdProject.startDate).toLocaleDateString('hu-HU', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        })}</span>
+                                        <span className="text-gray-700 leading-4">-</span>
+                                        <span className="text-gray-700 leading-4">{new Date(createdProject.endDate).toLocaleDateString('hu-HU', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        })}</span>
+                                    </div>}
+                            </div>
+                            <Dropzone onDrop={async acceptedFiles => {
+                                if (!acceptedFiles.length) return;
                                 const file = acceptedFiles[0];
-                                const fileNameParts = file.name.split('.');
-                                const newFileName = `${fileNameParts[0]}_${randomCode}.${fileNameParts[1]}`;
-                                const newFile = new File([file], newFileName, {type: file.type});
-                                formData.append("file", newFile);
-                                setCreatedProject({...createdProject, infopack: newFile.name});
+                                setUploading(true);
+                                try {
+                                    await setBlob(await upload(file.name, file, {
+                                        access: 'public',
+                                        handleUploadUrl: '/api/projectsapi/project/infopack',
+                                    }));
+                                    setCreatedProject({...createdProject, infopack: blob.url});
+                                } catch (error) {
+                                    console.error('Upload failed:', error);
+                                } finally {
+                                    setUploading(false);
+                                }
                             }}>
                                 {({getRootProps, getInputProps}) => (
-                                    <section>
+                                    <section className="w-full">
                                         <div {...getRootProps()}
-                                             className="border-3 border-blue-800 h-[10rem] rounded-xl cursor-pointer flex flex-col gap-2 justify-center items-center">
+                                             className=" border-3 border-dashed border-blue-800 h-[10rem] rounded-xl cursor-pointer flex flex-col gap-2 justify-center items-center">
                                             <input {...getInputProps()} />
                                             <p className="text-gray-700">Húzd ide a pdf fájlt, vagy kattints ide és
                                                 tallózd ki</p>
@@ -479,15 +497,14 @@ export default function ProjectsPage() {
                             {createdProject.infopack &&
                                 <div className="flex flex-row gap-2">
                                     <Chip className="pl-3" startContent={<FaFilePdf/>}
-                                          color="primary">{createdProject.infopack}</Chip>
+                                          color="primary">{blob.pathname}</Chip>
                                     <Chip onClick={() => {
                                         setCreatedProject({...createdProject, infopack: null})
-                                        setFormData(new FormData());
+                                        //del
                                     }}
                                           className="pl-3 cursor-pointer" startContent={<BiSolidXCircle/>}
                                           color="danger">Törlés</Chip>
                                 </div>
-
                             }
 
                             <div className="flex flex-row gap-2 justify-end">
@@ -496,10 +513,20 @@ export default function ProjectsPage() {
                                     Mégse
                                 </Button>
                                 <Button variant="ghost" color="success" radius="full" onPress={() => {
-                                    if (createdProject.infopack) uploadFile(formData)
-                                    createProject().then(() => {
-                                        window.location.reload();
-                                    });
+                                    if (!createdProject.type || !createdProject.country) {
+                                        addToast({
+                                            title: "Hiba",
+                                            description: "A típus és ország mezők kitöltése kötelező!",
+                                            color: 'warning',
+                                            radius: 'full',
+                                            timeout: 5000,
+                                            shouldShowTimeoutProgress: true,
+                                        })
+                                    } else {
+                                        createProject().then(() => {
+                                            window.location.reload();
+                                        });
+                                    }
                                 }}>
                                     Mentés
                                 </Button>
@@ -508,14 +535,14 @@ export default function ProjectsPage() {
                     )}
                 </ModalContent>
             </Modal>
-            <div className="mx-5">
+            <div className="mx-5 responsive-height">
                 <h1 className="mt-5 title text-center">Projektek</h1>
                 {isLoading ? <div className="text-center">
                         <Spinner color="primary" size="lg" className="pt-20"/>
                     </div> :
                     <>
-                        <div className="flex flex-row gap-2 items-center">
-                            <div className="w-4/5">
+                        <div className="flex flex-col sm:flex-row items-center">
+                            <div className="w-full sm:w-4/5">
                                 <RadioGroup label="Válassz nézetet:" value={selectedView} onValueChange={viewChange}
                                             orientation="horizontal"
                                             color="primary" className="my-4">
@@ -523,7 +550,7 @@ export default function ProjectsPage() {
                                     <Radio value="map" className="mr-1">Térkép</Radio>
                                     <Radio value="filter">Szűrő</Radio>
                                 </RadioGroup></div>
-                            <div className="w-1/5 text-end">
+                            <div className="w-full sm:w-1/5 text-end mb-2">
                                 <Button startContent={<BiSolidAddToQueue size="1.3em"/>} color="primary" radius="full"
                                         variant="ghost" onPress={onCreationModalOpen}>
                                     Új projekt

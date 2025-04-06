@@ -6,6 +6,7 @@ import "./globals.css";
 import {registerLicense} from '@syncfusion/ej2-base';
 import {Button} from "@heroui/react";
 import FloatingButton from "@/app/components/FloatingButton";
+import Footer from "./components/Footer";
 
 export const metadata = {
     title: "Közös Nevező Egyesület",
@@ -23,18 +24,20 @@ export default function RootLayout({children}) {
 
     return (
         <ClerkProvider localization={huHU}>
-            <html lang="en">
+            <html lang="en" className="bg-[#F2F2F2]">
             <head>
                 <link rel="icon" href="/favicon.ico"/>
             </head>
             <body
-                className="kozos-nevezo kanit-regular text-foreground bg-background h-auto min-h-screen"
+                className="kozos-nevezo kanit-regular text-foreground min-h-screen"
             >
 
-            <Navbar_/>
+
             <Providers>
+                <Navbar_/>
                 {children}
-                <FloatingButton/>
+                {/* <FloatingButton/> */}
+                <Footer/>
             </Providers>
             </body>
             </html>

@@ -51,6 +51,7 @@ export default function ProjectPage({params}) {
     const {isLoaded, user} = useUser()
     const [isButtonsDisabled, setIsButtonsDisabled] = useState(false);
     const [uniqueOrganizations, setUniqueOrganizations] = useState([]);
+    const [blob, setBlob] = useState(null);
     const {
         isOpen: isDeletionConfirmationModalOpen,
         onOpen: onDeletionConfirmationModalOpen,
@@ -129,6 +130,19 @@ export default function ProjectPage({params}) {
             });
     }
 
+    const fetchBlob = async () => {
+        await fetch(`/api/projectsapi/project/infopack?url=${project.infopack}`, {
+            method: 'GET'
+        })
+            .then(response => response.json())
+            .then(blobDetails => {
+                setBlob(blobDetails)
+            })
+            .catch(error => {
+                console.error('Error fetching blob:', error)
+            });
+    }
+
     const fetchUsers = async () => {
         await fetch(`/api/users`, {
             method: 'GET'
@@ -154,8 +168,12 @@ export default function ProjectPage({params}) {
     }, [params]);
 
     useEffect(() => {
-        fetchProject()
-        fetchUsers()
+        fetchProject().then(r => {
+            if (project && project.infopack) {
+                fetchBlob();
+            }
+        }).finally(() => fetchUsers());
+
     }, [id]);
 
     const updateProject = async () => {
@@ -190,37 +208,6 @@ export default function ProjectPage({params}) {
                 setIsProjectLoaded(true)
             });
     }
-
-    const handleDownload = async (fileName) => {
-        try {
-            const response = await fetch(`/api/projectsapi/project/infopack?fileName=${fileName}`, {method: 'GET'});
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-        } catch (error) {
-            console.error("Error downloading file:", error);
-        }
-    };
-
-    const handleDelete = async (fileName) => {
-        try {
-            const response = await fetch(`/api/projectsapi/project/infopack?fileName=${fileName}`, {method: 'DELETE'});
-            if (response.ok) {
-                console.log("File deleted successfully");
-                setProject({...project, infopack: null});
-            } else {
-                console.error("Error deleting file");
-            }
-        } catch (error) {
-            console.error("Error deleting file:", error);
-        }
-    };
-
 
     return (
         <>
@@ -459,11 +446,10 @@ export default function ProjectPage({params}) {
                                     {project.infopack &&
                                         <div className="flex flex-row gap-2">
                                             <Chip className="pl-3 cursor-pointer"
-                                                  onClick={() => handleDownload(project.infopack)}
                                                   startContent={<FaFilePdf/>} color="primary">
-                                                {project.infopack}
+                                                {blob.pathname}
                                             </Chip>
-                                            <Chip onClick={() => handleDelete(project.infopack)}
+                                            <Chip
                                                   className="pl-3 cursor-pointer" startContent={<BiSolidXCircle/>}
                                                   color="danger">Törlés</Chip>
                                         </div>

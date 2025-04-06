@@ -1,6 +1,7 @@
 'use client'
 
 import {AnimatedTestimonials} from "../components/animated-testimonials";
+import "../globals.css";
 
 export default function AboutPage() {
     const testimonials = [
@@ -21,8 +22,8 @@ export default function AboutPage() {
 
     ];
     return (
-        <div>
-            <h1 className="mt-5 title text-center">Rólunk</h1>
+        <div className="responsive-height ">
+            <h1 className="m-5 title text-center self-start">Rólunk</h1>
             <AnimatedTestimonials testimonials={testimonials}/>
         </div>
     );

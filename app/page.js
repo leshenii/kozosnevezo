@@ -29,8 +29,8 @@ export default function Home() {
     }, []);
 
     return (
-        <div className="flex flex-col items-center border-red-600 justify-center pb-[110px] sm:pb-[0px] h-screen-minus-navbar mx-3 text-center">
-            <span className="kanit-semibold text-4xl sm:text-6xl">Már nem kevesebb, mint</span>
+        <div className="flex flex-col items-center justify-center  pb-[110px] sm:pb-[24px] text-center responsive-height">
+            <span className="kanit-semibold text-4xl sm:text-6xl ">Már nem kevesebb, mint</span>
             { isLoading ?
                 <Spinner color="primary" size="lg" className="py-7"/>
                 :

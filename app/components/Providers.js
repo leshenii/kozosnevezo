@@ -1,4 +1,4 @@
-import { HeroUIProvider } from '@heroui/react';
+import { HeroUIProvider, ToastProvider } from '@heroui/react';
 import {Suspense} from "react";
 
 /**
@@ -11,6 +11,7 @@ import {Suspense} from "react";
 export function Providers({ children }) {
     return (
         <HeroUIProvider>
+            <ToastProvider placement="top-center" />
             <Suspense fallback={<div>Loading...</div>}>
                 {children}
             </Suspense>

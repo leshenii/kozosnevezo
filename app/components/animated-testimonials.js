@@ -32,10 +32,10 @@ export const AnimatedTestimonials = ({
     const rotationValues = [7, -5, 3, -8, 2];
 
     return (
-        <div className="max-w-sm md:max-w-5xl mx-auto sm:mr-[5%] antialiased font-sans pb-20 px-4 md:px-8 lg:px-12 py-10">
-            <div className="relative grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div className=" mx-auto sm:mr-[5%] antialiased font-sans px-4 md:px-8 lg:px-12 ">
+            <div className=" grid grid-cols-1 md:grid-cols-2 gap-10">
 
-                <div className="relative h-80 w-80 justify-self-center sm:justify-self-end">
+                <div className=" relative h-80 w-80 justify-self-center sm:justify-self-end">
                     <AnimatePresence>
                         {testimonials.map((testimonial, index) => (
                             <motion.div
@@ -70,8 +70,8 @@ export const AnimatedTestimonials = ({
                                 <Image
                                     src={testimonial.src}
                                     alt={testimonial.name}
-                                    width={600}
-                                    height={600}
+                                    width={550}
+                                    height={550}
                                     draggable={false}
                                     className="h-full w-full rounded-3xl object-cover object-center"/>
                             </motion.div>

@@ -10,7 +10,7 @@ import {
     Input, Modal, ModalBody, ModalContent,
     RangeCalendar,
     Select,
-    SelectItem,
+    SelectItem, Slider,
     Spinner, useDisclosure
 } from "@heroui/react";
 import {snakeCase} from "snake-case";
@@ -29,7 +29,6 @@ import {
 import {router} from "next/client";
 import {useRouter} from "next/navigation";
 import {FaFilePdf} from "react-icons/fa6";
-import {downloadFile} from "@/app/components/UploadFile";
 
 countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 countries.registerLocale(require("i18n-iso-countries/langs/hu.json"));
@@ -38,7 +37,7 @@ export default function ProjectPage({params}) {
 
     const [projects, setProjects] = useState([])
     const [id, setId] = useState(null);
-    const [project, setProject] = useState(null);
+    const [project, setProject] = useState({infopack: null});
     const [isProjectLoaded, setIsProjectLoaded] = useState(false);
     const [isUsersLoaded, setIsUsersLoaded] = useState(false);
     const [editMode, setEditMode] = useState(false);
@@ -52,6 +51,7 @@ export default function ProjectPage({params}) {
     const [isButtonsDisabled, setIsButtonsDisabled] = useState(false);
     const [uniqueOrganizations, setUniqueOrganizations] = useState([]);
     const [blob, setBlob] = useState(null);
+    const [isBlobLoaded, setIsBlobLoaded] = useState(false);
     const {
         isOpen: isDeletionConfirmationModalOpen,
         onOpen: onDeletionConfirmationModalOpen,
@@ -108,7 +108,7 @@ export default function ProjectPage({params}) {
         {key: "advanced_planning_visit", label: "Advanced Planning Visit"},
     ];
 
-    const fetchProject = async () => {
+    async function fetchProject() {
         if (!id) return;
         await fetch(`/api/projectsapi/project?projectId=${id}`, {
             method: 'GET'
@@ -130,8 +130,8 @@ export default function ProjectPage({params}) {
             });
     }
 
-    const fetchBlob = async () => {
-        await fetch(`/api/projectsapi/project/infopack?url=${project.infopack}`, {
+    const fetchBlob = async (infopack) => {
+        await fetch(`/api/projectsapi/project/infopack?url=${infopack}`, {
             method: 'GET'
         })
             .then(response => response.json())
@@ -140,7 +140,7 @@ export default function ProjectPage({params}) {
             })
             .catch(error => {
                 console.error('Error fetching blob:', error)
-            });
+            }).finally(() => setIsBlobLoaded(true))
     }
 
     const fetchUsers = async () => {
@@ -150,12 +150,10 @@ export default function ProjectPage({params}) {
             .then(response => response.json())
             .then(user => {
                 setUsers(user)
-                setIsUsersLoaded(true)
             })
             .catch(error => {
                 console.error('Error fetching users:', error)
-                setIsUsersLoaded(true)
-            });
+            }).finally(() => setIsUsersLoaded(true))
     }
 
     useEffect(() => {
@@ -168,13 +166,21 @@ export default function ProjectPage({params}) {
     }, [params]);
 
     useEffect(() => {
-        fetchProject().then(r => {
-            if (project && project.infopack) {
-                fetchBlob();
-            }
-        }).finally(() => fetchUsers());
-
+        fetchProject()
+        fetchUsers()
     }, [id]);
+
+    useEffect(() => {
+        console.log(blob)
+    }, [blob]);
+
+    useEffect(() => {
+        if (project && project.infopack) {
+            fetchBlob(project.infopack)
+        } else {
+            setIsBlobLoaded(true)
+        }
+    }, [project.infopack]);
 
     const updateProject = async () => {
         await fetch(`/api/projectsapi/project`, {
@@ -209,6 +215,30 @@ export default function ProjectPage({params}) {
             });
     }
 
+    async function handleDeleteInfopack(infopackUrl) {
+        if (!infopackUrl) {
+            console.error("No infopack URL provided.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/projectsapi/project/infopack?url=${infopackUrl}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                console.log("Infopack deleted successfully.");
+                setProject({...project, infopack: null});
+                setBlob(null);
+
+            } else {
+                console.error("Failed to delete infopack:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error deleting infopack:", error);
+        }
+    }
+
     return (
         <div className="responsive-height">
             <Modal isOpen={isDeletionConfirmationModalOpen} size="xs" onClose={onDeletionConfirmationModalClose}>
@@ -236,7 +266,7 @@ export default function ProjectPage({params}) {
                     )}
                 </ModalContent>
             </Modal>
-            {!isUsersLoaded || !isProjectLoaded ? (
+            {!isUsersLoaded || !isProjectLoaded || !isBlobLoaded ? (
                 <div className="text-center">
                     <Spinner color="primary" size="lg" className="pt-20"/>
                 </div>
@@ -268,7 +298,7 @@ export default function ProjectPage({params}) {
                                                 isDisabled={isButtonsDisabled}
                                                 onPress={() => {
                                                     setIsButtonsDisabled(true)
-                                                    updateProject()
+                                                    updateProject().then(() => setIsButtonsDisabled(false))
                                                 }}
                                                 startContent={<BiSolidSave size="1.5rem"/>}
 
@@ -440,18 +470,67 @@ export default function ProjectPage({params}) {
                                                         endDate: new Date(value.end)
                                                     })}
                                                 />
+                                                <Slider
+                                                    label="Résztvevők / ország"
+                                                    color="primary"
+                                                    radius="full"
+                                                    maxValue={30}
+                                                    minValue={0}
+                                                    step={1}
+                                                    size="sm"
+                                                    showTooltip={true}
+                                                    marks={[
+                                                        {
+                                                            value: 1,
+                                                            label: "1",
+                                                        },
+                                                        {
+                                                            value: 5,
+                                                            label: "5",
+                                                        },
+                                                        {
+                                                            value: 10,
+                                                            label: "10",
+                                                        },
+                                                        {
+                                                            value: 15,
+                                                            label: "15",
+                                                        },
+                                                        {
+                                                            value: 20,
+                                                            label: "20",
+                                                        },
+                                                        {
+                                                            value: 25,
+                                                            label: "25",
+                                                        },
+                                                        {
+                                                            value: 30,
+                                                            label: "30",
+                                                        }
+                                                    ]}
+                                                    value={project.numberOfParticipants || 0}
+                                                    onChange={(value) => setProject({
+                                                        ...project,
+                                                        numberOfParticipants: value
+                                                    })}
+                                                    />
+
                                             </div>
                                         </div>
                                     </div>
-                                    {project.infopack &&
+                                    {blob && blob.pathname &&
                                         <div className="flex flex-row gap-2">
                                             <Chip className="pl-3 cursor-pointer"
-                                                  startContent={<FaFilePdf/>} color="primary">
+                                                  startContent={<FaFilePdf/>} color="primary"
+                                                  onClick={() => router.push(blob.downloadUrl)}
+                                            >
                                                 {blob.pathname}
                                             </Chip>
                                             <Chip
-                                                  className="pl-3 cursor-pointer" startContent={<BiSolidXCircle/>}
-                                                  color="danger">Törlés</Chip>
+                                                className="pl-3 cursor-pointer" startContent={<BiSolidXCircle/>}
+                                                color="danger" onClick={() => handleDeleteInfopack(blob.url)}
+                                            >Törlés</Chip>
                                         </div>
                                     }
                                     <div className="flex flex-col gap-2 w-full sm:w-1/2">
@@ -478,6 +557,7 @@ export default function ProjectPage({params}) {
                                                     <Chip color="primary"
                                                           size="sm"
                                                           endContent={<BiSolidUser/>}
+                                                          onClick={() => router.push(blob.downloadUrl)}
                                                     >{participants.length} résztvevő</Chip>
                                                 </div>
                                             </div>
@@ -579,13 +659,18 @@ export default function ProjectPage({params}) {
                                             />
                                         </div>
                                     </div>
-                                    {project.infopack &&
+                                    {blob && blob.pathname &&
                                         <Chip className="pl-3 cursor-pointer"
-                                              onClick={() => handleDownload(project.infopack)}
+                                              onClick={() => router.push(blob.downloadUrl)}
                                               startContent={<FaFilePdf/>} color="primary">
-                                            {project.infopack}
+                                            {blob.pathname}
                                         </Chip>
                                     }
+                                    {project && project.numberOfParticipants && (
+                                        <div className="flex flex-row gap-1">
+                                            <BiSolidUser size="1.5rem" className="text-blue-800"/> Résztevők száma / ország: {project.numberOfParticipants}
+                                        </div>
+                                    )}
                                     <div className="flex flex-col gap-2 flex-gorw min-w-1/2 w-full">
                                         <div className="border-solid border-0 border-l-[3px] border-blue-900">
                                             <h2 className="kanit-semibold text-xl ml-2 text-gray-800">Csapatvezető</h2>

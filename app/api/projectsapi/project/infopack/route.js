@@ -1,7 +1,5 @@
-import {deleteInfopack, downloadFile} from "../../../../components/UploadFile";
-import { parse } from 'url';
 import { handleUpload } from '@vercel/blob/client';
-import { head } from '@vercel/blob';
+import { head, del } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 
 export async function GET(request) {
@@ -12,21 +10,27 @@ export async function GET(request) {
     return Response.json(blobDetails);
 }
 
-export async function DELETE(req, res) {
-    const { query } = parse(req.url, true);
-    const { fileName } = query;
+export async function DELETE(request) {
+    const { searchParams } = new URL(request.url);
+    const blobUrl = searchParams.get('url');
+
+    if (!blobUrl) {
+        return new Response('Blob URL is required', { status: 400 });
+    }
 
     try {
-        await deleteInfopack(fileName);
-        console.error('File deleted successfully:', fileName);
-        return new Response('File deleted successfully', {
-            status: 200
-        })
+        // Check if the blob exists
+        const blobDetails = await head(blobUrl, { token: process.env.BLOB_READ_WRITE_TOKEN });
+        if (!blobDetails) {
+            return new Response('Blob not found', { status: 404 });
+        }
+
+        // Delete the blob
+        await del(blobUrl, { token: process.env.BLOB_READ_WRITE_TOKEN });
+        return new Response('Blob deleted successfully', { status: 200 });
     } catch (error) {
-        console.error("Error deleting file:", error);
-        return new Response('Internal Server Error', {
-            status: 500
-        })
+        console.error('Error deleting blob:', error);
+        return new Response('Internal Server Error', { status: 500 });
     }
 }
 

@@ -45,13 +45,13 @@ import {BiSolidAddToQueue, BiSolidErrorCircle, BiSolidUser, BiSolidXCircle} from
 import {TbHandClick} from "react-icons/tb";
 import {registerLicense} from '@syncfusion/ej2-base';
 import Dropzone from 'react-dropzone'
-import {uploadFile} from "../components/UploadFile";
 import {MdPictureAsPdf} from "react-icons/md";
 import {FaFilePdf} from "react-icons/fa6";
 import {upload} from '@vercel/blob/client';
 import {head} from "@vercel/blob";
 import {FaCalendarWeek} from "react-icons/fa";
 import {useUser} from "@clerk/nextjs";
+import handleDeleteInfopack from "./[id]/page";
 
 registerLicense(process.env.NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY);
 
@@ -307,6 +307,30 @@ export default function ProjectsPage() {
             });
     };
 
+    async function handleDeleteInfopack(infopackUrl) {
+        if (!infopackUrl) {
+            console.error("No infopack URL provided.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/projectsapi/project/infopack?url=${infopackUrl}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                console.log("Infopack deleted successfully.");
+                setCreatedProject({...createdProject, infopack: null});
+                setBlob(null);
+
+            } else {
+                console.error("Failed to delete infopack:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error deleting infopack:", error);
+        }
+    }
+
 
     useEffect(() => {
         console.log(createdProject)
@@ -393,45 +417,6 @@ export default function ProjectsPage() {
                                     {org.label}
                                 </AutocompleteItem>}
                             </Autocomplete>
-                            <Autocomplete
-                                errorMessage={createdProject.country && createdProject.country.length > 0 || !countryTouched ? "" : "Választanod kell egy országot!"}
-                                isInvalid={createdProject.country && createdProject.country.length > 0 || !countryTouched ? false : true}
-                                onClose={() => setCountryTouched(true)}
-                                defaultItems={europeanCountries}
-                                label="Ország"
-                                isRequired
-                                color="primary"
-                                variant="underlined"
-                                defaultSelectedKey={createdProject.country ? countries.getAlpha2Code(createdProject.country, 'hu').toLowerCase() : null}
-                                onSelectionChange={(selected) => setCreatedProject({
-                                    ...createdProject,
-                                    country: countries.getName(selected, 'hu') ? countries.getName(selected, 'hu') : null
-                                })}
-                                startContent={createdProject.country &&
-                                    <Avatar alt="flag" className="!w-6 !h-6 min-w-[24px]"
-                                            src={`https://flagcdn.com/${countries.getAlpha2Code(createdProject.country, 'hu').toLowerCase()}.svg`}/>}
-                            >
-                                {(country) => <AutocompleteItem key={country.key}
-                                                                startContent={
-                                                                    <Avatar alt="flag"
-                                                                            className="w-6 h-6"
-                                                                            src={`https://flagcdn.com/${country.key}.svg`}/>
-                                                                }>
-                                    {country.label}
-                                </AutocompleteItem>}
-                            </Autocomplete>
-                            <Input
-                                isClearable
-                                variant="underlined"
-                                color="primary"
-                                value={createdProject.location}
-                                onValueChange={(value) => setCreatedProject({
-                                    ...createdProject,
-                                    location: value
-                                })}
-                                label="Város"
-                            >
-                            </Input>
                             <Slider
                                 label="Résztvevők / ország"
                                 color="primary"
@@ -477,6 +462,45 @@ export default function ProjectsPage() {
                                     numberOfParticipants: value
                                 })}
                             />
+                            <Autocomplete
+                                errorMessage={createdProject.country && createdProject.country.length > 0 || !countryTouched ? "" : "Választanod kell egy országot!"}
+                                isInvalid={createdProject.country && createdProject.country.length > 0 || !countryTouched ? false : true}
+                                onClose={() => setCountryTouched(true)}
+                                defaultItems={europeanCountries}
+                                label="Ország"
+                                isRequired
+                                color="primary"
+                                variant="underlined"
+                                defaultSelectedKey={createdProject.country ? countries.getAlpha2Code(createdProject.country, 'hu').toLowerCase() : null}
+                                onSelectionChange={(selected) => setCreatedProject({
+                                    ...createdProject,
+                                    country: countries.getName(selected, 'hu') ? countries.getName(selected, 'hu') : null
+                                })}
+                                startContent={createdProject.country &&
+                                    <Avatar alt="flag" className="!w-6 !h-6 min-w-[24px]"
+                                            src={`https://flagcdn.com/${countries.getAlpha2Code(createdProject.country, 'hu').toLowerCase()}.svg`}/>}
+                            >
+                                {(country) => <AutocompleteItem key={country.key}
+                                                                startContent={
+                                                                    <Avatar alt="flag"
+                                                                            className="w-6 h-6"
+                                                                            src={`https://flagcdn.com/${country.key}.svg`}/>
+                                                                }>
+                                    {country.label}
+                                </AutocompleteItem>}
+                            </Autocomplete>
+                            <Input
+                                isClearable
+                                variant="underlined"
+                                color="primary"
+                                value={createdProject.location}
+                                onValueChange={(value) => setCreatedProject({
+                                    ...createdProject,
+                                    location: value
+                                })}
+                                label="Város"
+                            >
+                            </Input>
                             <iframe className="mt-2" width="100%" height="300"
                                     style={{border: '0'}}
                                     loading="lazy"
@@ -515,16 +539,17 @@ export default function ProjectsPage() {
                                         })}</span>
                                     </div>}
                             </div>
-                            <Dropzone onDrop={async acceptedFiles => {
+                            <Dropzone onDrop={async (acceptedFiles) => {
                                 if (!acceptedFiles.length) return;
                                 const file = acceptedFiles[0];
                                 setUploading(true);
                                 try {
-                                    await setBlob(await upload(file.name, file, {
+                                    const uploadedBlob = await upload(file.name, file, {
                                         access: 'public',
                                         handleUploadUrl: '/api/projectsapi/project/infopack',
-                                    }));
-                                    setCreatedProject({...createdProject, infopack: blob.url});
+                                    });
+                                    setBlob(uploadedBlob);
+                                    setCreatedProject({...createdProject, infopack: uploadedBlob.url});
                                 } catch (error) {
                                     console.error('Upload failed:', error);
                                 } finally {
@@ -543,13 +568,16 @@ export default function ProjectsPage() {
                                     </section>
                                 )}
                             </Dropzone>
-                            {createdProject.infopack &&
+                            {uploading ? <Spinner color="primary"/> :
+                            createdProject.infopack &&
                                 <div className="flex flex-row gap-2">
                                     <Chip className="pl-3" startContent={<FaFilePdf/>}
                                           color="primary">{blob.pathname}</Chip>
                                     <Chip onClick={() => {
+                                        handleDeleteInfopack(blob.url)
                                         setCreatedProject({...createdProject, infopack: null})
-                                        //del
+                                        setBlob(null)
+
                                     }}
                                           className="pl-3 cursor-pointer" startContent={<BiSolidXCircle/>}
                                           color="danger">Törlés</Chip>
@@ -586,7 +614,7 @@ export default function ProjectsPage() {
             </Modal>
             <div className="mx-5 responsive-height">
                 <h1 className="mt-5 title text-center">Projektek</h1>
-                {isLoading ? <div className="text-center">
+                {isLoading && !isLoaded ? <div className="text-center">
                         <Spinner color="primary" size="lg" className="pt-20"/>
                     </div> :
                     <>

@@ -23,7 +23,7 @@ import {
     Input,
     Select,
     SelectItem,
-    RangeCalendar, Chip, addToast
+    RangeCalendar, Chip, addToast, Slider
 } from "@heroui/react";
 import gregorian_hu from "../lib/gregorian_hu";
 import {
@@ -51,6 +51,7 @@ import {FaFilePdf} from "react-icons/fa6";
 import {upload} from '@vercel/blob/client';
 import {head} from "@vercel/blob";
 import {FaCalendarWeek} from "react-icons/fa";
+import {useUser} from "@clerk/nextjs";
 
 registerLicense(process.env.NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY);
 
@@ -101,7 +102,8 @@ export default function ProjectsPage() {
         country: "",
         location: "",
         organization: "",
-        type: ""
+        type: "",
+        numberOfParticipants: null
     });
     const {isOpen: isCreationModalOpen, onOpen: onCreationModalOpen, onClose: onCreationModalClose} = useDisclosure();
     const [typeTouched, setTypeTouched] = useState(false);
@@ -110,6 +112,7 @@ export default function ProjectsPage() {
     const [organizationValue, setOrganizationValue] = useState({id: null, name: ''});
     const [blob, setBlob] = useState(null);
     const [uploading, setUploading] = useState(false);
+    const {isLoaded, user} = useUser()
 
     const shapeSelected = (args) => {
 
@@ -168,12 +171,6 @@ export default function ProjectsPage() {
         }
     };
 
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            setNumberOfMonths(window.innerWidth < 640 ? 1 : 3);
-        }
-    }, []);
-
     const fetchProjects = async () => {
         await fetch('/api/projectsapi', {
             method: 'GET'
@@ -210,16 +207,15 @@ export default function ProjectsPage() {
                     label: type,
                     key: snakeCase(removeAccents(type))
                 })))
-                setIsLoading(false)
+
             })
             .catch(error => {
                 console.error('Error fetching projects:', error)
-                setIsLoading(false);
-            });
+            })
     }
 
     useEffect(() => {
-        fetchProjects()
+        fetchProjects().then(() => setIsLoading(false));
     }, []);
 
     const getProjectTitles = (date) => {
@@ -239,21 +235,25 @@ export default function ProjectsPage() {
         const projectTitles = projectTitlesRaw.map(project => project.title);
         return {
             children: projectTitles.length > 0 ? (
-                window.innerWidth < 640 ?
-                    <Popover showArrow={true}>
-                        <PopoverTrigger>
-                            <div>{date.day}</div>
-                        </PopoverTrigger>
-                        <PopoverContent className="items-start"
-                                        onClick={() => redirect(`/projects/${projectTitlesRaw[0].id}`)}>
-                            {projectTitles.join(', ')}
-                            <p className="text-xs text-blue-900">Részletekért kattints</p>
-                        </PopoverContent>
-                    </Popover>
-                    :
-                    <Tooltip content={projectTitles.join(', ')} showArrow={true}>
-                        <div onClick={() => redirect(`/projects/${projectTitlesRaw[0].id}`)}>{date.day}</div>
-                    </Tooltip>
+                <>
+                    <div className="sm:hidden">
+                        <Popover showArrow={true}>
+                            <PopoverTrigger>
+                                <div>{date.day}</div>
+                            </PopoverTrigger>
+                            <PopoverContent className="items-start"
+                                            onClick={() => redirect(`/projects/${projectTitlesRaw[0].id}`)}>
+                                {projectTitles.join(', ')}
+                                <p className="text-xs text-blue-900">Részletekért kattints</p>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                    <div className="hidden sm:block">
+                        <Tooltip content={projectTitles.join(', ')} showArrow={true}>
+                            <div onClick={() => redirect(`/projects/${projectTitlesRaw[0].id}`)}>{date.day}</div>
+                        </Tooltip>
+                    </div>
+                </>
             ) : (
                 <div>{date.day}</div>
             )
@@ -307,9 +307,11 @@ export default function ProjectsPage() {
             });
     };
 
+
     useEffect(() => {
-        console.log(blob)
-    }, [blob]);
+        console.log(createdProject)
+    }, [createdProject]);
+
 
     return (
         <>
@@ -430,6 +432,51 @@ export default function ProjectsPage() {
                                 label="Város"
                             >
                             </Input>
+                            <Slider
+                                label="Résztvevők / ország"
+                                color="primary"
+                                radius="full"
+                                maxValue={30}
+                                minValue={0}
+                                step={1}
+                                size="sm"
+                                showTooltip={true}
+                                marks={[
+                                    {
+                                        value: 1,
+                                        label: "1",
+                                    },
+                                    {
+                                        value: 5,
+                                        label: "5",
+                                    },
+                                    {
+                                        value: 10,
+                                        label: "10",
+                                    },
+                                    {
+                                        value: 15,
+                                        label: "15",
+                                    },
+                                    {
+                                        value: 20,
+                                        label: "20",
+                                    },
+                                    {
+                                        value: 25,
+                                        label: "25",
+                                    },
+                                    {
+                                        value: 30,
+                                        label: "30",
+                                    }
+                                ]}
+                                value={createdProject.numberOfParticipants || 0}
+                                onChange={(value) => setCreatedProject({
+                                    ...createdProject,
+                                    numberOfParticipants: value
+                                })}
+                            />
                             <iframe className="mt-2" width="100%" height="300"
                                     style={{border: '0'}}
                                     loading="lazy"
@@ -452,14 +499,16 @@ export default function ProjectsPage() {
                                 />
                                 {createdProject.startDate && createdProject.endDate &&
                                     <div className="flex flex-col text-center ml-5 items-center justify-center">
-                                        <FaCalendarWeek className="text-gray-700" />
-                                        <span className="text-gray-700 leading-4 pt-1">{new Date(createdProject.startDate).toLocaleDateString('hu-HU', {
+                                        <FaCalendarWeek className="text-gray-700"/>
+                                        <span
+                                            className="text-gray-700 leading-4 pt-1">{new Date(createdProject.startDate).toLocaleDateString('hu-HU', {
                                             year: 'numeric',
                                             month: 'long',
                                             day: 'numeric'
                                         })}</span>
                                         <span className="text-gray-700 leading-4">-</span>
-                                        <span className="text-gray-700 leading-4">{new Date(createdProject.endDate).toLocaleDateString('hu-HU', {
+                                        <span
+                                            className="text-gray-700 leading-4">{new Date(createdProject.endDate).toLocaleDateString('hu-HU', {
                                             year: 'numeric',
                                             month: 'long',
                                             day: 'numeric'
@@ -550,28 +599,51 @@ export default function ProjectsPage() {
                                     <Radio value="map" className="mr-1">Térkép</Radio>
                                     <Radio value="filter">Szűrő</Radio>
                                 </RadioGroup></div>
-                            <div className="w-full sm:w-1/5 text-end mb-2">
-                                <Button startContent={<BiSolidAddToQueue size="1.3em"/>} color="primary" radius="full"
-                                        variant="ghost" onPress={onCreationModalOpen}>
-                                    Új projekt
-                                </Button>
-                            </div>
+                            {user && user.publicMetadata.role === "admin" && (
+                                <div className="w-full sm:w-1/5 text-end mb-2">
+                                    <Button startContent={<BiSolidAddToQueue size="1.3em"/>} color="primary"
+                                            radius="full"
+                                            variant="ghost" onPress={onCreationModalOpen}>
+                                        Új projekt
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                         {
                             selectedView === "calendar" && (
-                                <Calendar
-                                    value={projectIntervals}
-                                    onChange={setProjectIntervals}
-                                    readOnly={true}
-                                    multiple
-                                    range
-                                    weekStartDayIndex={1}
-                                    locale={gregorian_hu}
-                                    currentDate={new DateObject()}
-                                    mapDays={mapDays}
-                                    className="mx-auto"
-                                    numberOfMonths={window.innerWidth < 640 ? 1 : 3}
-                                />
+                                <>
+                                    <div className="sm:hidden">
+                                        <Calendar
+                                            value={projectIntervals}
+                                            onChange={setProjectIntervals}
+                                            readOnly={true}
+                                            multiple
+                                            range
+                                            weekStartDayIndex={1}
+                                            locale={gregorian_hu}
+                                            currentDate={new DateObject()}
+                                            mapDays={mapDays}
+                                            className="mx-auto"
+                                            numberOfMonths={1}
+                                        />
+                                    </div>
+                                    <div className="hidden sm:block">
+                                        <Calendar
+                                            value={projectIntervals}
+                                            onChange={setProjectIntervals}
+                                            readOnly={true}
+                                            multiple
+                                            range
+                                            weekStartDayIndex={1}
+                                            locale={gregorian_hu}
+                                            currentDate={new DateObject()}
+                                            mapDays={mapDays}
+                                            className="mx-auto"
+                                            numberOfMonths={3}
+                                        />
+                                    </div>
+                                </>
+
                             )
                         }
                         {

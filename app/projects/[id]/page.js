@@ -210,7 +210,7 @@ export default function ProjectPage({params}) {
     }
 
     return (
-        <>
+        <div className="responsive-height">
             <Modal isOpen={isDeletionConfirmationModalOpen} size="xs" onClose={onDeletionConfirmationModalClose}>
                 <ModalContent>
                     {(onClose) => (
@@ -624,6 +624,6 @@ export default function ProjectPage({params}) {
                     </div>
                 )
             )}
-        </>
+        </div>
     );
 }

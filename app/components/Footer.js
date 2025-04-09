@@ -7,6 +7,7 @@ import { MailIconMobile, MailIconDesktop, InstagramIconMobile, InstagramIconDesk
 import {motion} from "motion/react"
 import {AiFillInstagram, AiFillTikTok} from "react-icons/ai";
 import {RiInstagramFill} from "react-icons/ri";
+import {MdEmail} from "react-icons/md";
 
 export default function Footer() {
 
@@ -81,6 +82,14 @@ export default function Footer() {
                 >
                     <AiFillTikTok size="35px" className="fill-blue-900" />
                 </motion.div>
+                <motion.div
+                    whileHover={{scale: 1.1}}
+                    whileTap={{scale: 0.9, borderRadius: "100%"}}
+                    onClick={() => window.open('mailto:kozosnevezo@outlook.com', '_blank')}
+                    className="cursor-pointer"
+                >
+                    <MdEmail size="35px" className="fill-blue-900" />
+                </motion.div>
                 <Dropdown>
                     <DropdownTrigger>
                         <Button variant="solid" radius="full" size="sm" color="primary">Dokumentumok</Button>
@@ -128,6 +137,14 @@ export default function Footer() {
                     className="cursor-pointer"
                 >
                     <AiFillTikTok size="35px" className="fill-blue-900" />
+                </motion.div>
+                <motion.div
+                    whileHover={{scale: 1.1}}
+                    whileTap={{scale: 0.9, borderRadius: "100%"}}
+                    onClick={() => window.open('mailto:kozosnevezo@outlook.com', '_blank')}
+                    className="cursor-pointer"
+                >
+                    <MdEmail size="35px" className="fill-blue-900" />
                 </motion.div>
                 <Dropdown>
                     <DropdownTrigger>

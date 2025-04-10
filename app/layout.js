@@ -4,8 +4,6 @@ import {ClerkProvider} from "@clerk/nextjs";
 import {huHU} from '@clerk/localizations'
 import "./globals.css";
 import {registerLicense} from '@syncfusion/ej2-base';
-import {Button} from "@heroui/react";
-import FloatingButton from "@/app/components/FloatingButton";
 import Footer from "./components/Footer";
 
 export const metadata = {

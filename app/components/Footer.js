@@ -3,10 +3,8 @@
 import {SignedIn, SignedOut, UserButton} from "@clerk/nextjs";
 import {Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger} from "@heroui/react";
 import {useRouter} from "next/navigation";
-import { MailIconMobile, MailIconDesktop, InstagramIconMobile, InstagramIconDesktop } from "../lib/icons";
 import {motion} from "motion/react"
 import {AiFillInstagram, AiFillTikTok} from "react-icons/ai";
-import {RiInstagramFill} from "react-icons/ri";
 import {MdEmail} from "react-icons/md";
 
 export default function Footer() {
@@ -17,6 +15,18 @@ export default function Footer() {
         {
             key: "Alapszabaly.pdf",
             label: "Alapszabály",
+        },
+        {
+            key: "adatkezelesi_tajekoztato.pdf",
+            label: "Adatkezelési tájékoztató",
+        },
+        {
+            key: "felhasznalasi_feltetelek.pdf",
+            label: "Felhasználási feltételek",
+        },
+        {
+            key: "felhasznaloi_adatok_torlesenek_utmutatoja.pdf",
+            label: "Felhasználói adatok törlésének útmutatója",
         },
         {
             key: "Beszamolo_2013.pdf",

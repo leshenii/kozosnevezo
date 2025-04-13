@@ -507,7 +507,7 @@ export default function ProjectsPage() {
                                     allowFullScreen
                                     src={`https://www.google.com/maps/embed/v1/place?q=${createdProject.location},${createdProject.country}&key=AIzaSyBQpb-zeHME6F8U4pDQIMpZ3gx3ScgnfuE`}>
                             </iframe>
-                            <div className="flex flex-row self-start">
+                            <div className="flex flex-col sm:flex-row sm:self-start">
                                 <RangeCalendar
                                     calendarWidth={300}
                                     color="primary"
@@ -522,10 +522,11 @@ export default function ProjectsPage() {
                                     })}
                                 />
                                 {createdProject.startDate && createdProject.endDate &&
-                                    <div className="flex flex-col text-center ml-5 items-center justify-center">
+                                    <div
+                                        className="flex flex-row sm:flex-col text-center sm:ml-5 items-center sm:justify-center gap-2 sm:gap-0 pt-2 sm:pt-0">
                                         <FaCalendarWeek className="text-gray-700"/>
                                         <span
-                                            className="text-gray-700 leading-4 pt-1">{new Date(createdProject.startDate).toLocaleDateString('hu-HU', {
+                                            className="text-gray-700 leading-4 sm:pt-1">{new Date(createdProject.startDate).toLocaleDateString('hu-HU', {
                                             year: 'numeric',
                                             month: 'long',
                                             day: 'numeric'
@@ -539,37 +540,40 @@ export default function ProjectsPage() {
                                         })}</span>
                                     </div>}
                             </div>
-                            <Dropzone onDrop={async (acceptedFiles) => {
-                                if (!acceptedFiles.length) return;
-                                const file = acceptedFiles[0];
-                                setUploading(true);
-                                try {
-                                    const uploadedBlob = await upload(file.name, file, {
-                                        access: 'public',
-                                        handleUploadUrl: '/api/projectsapi/project/infopack',
-                                    });
-                                    setBlob(uploadedBlob);
-                                    setCreatedProject({...createdProject, infopack: uploadedBlob.url});
-                                } catch (error) {
-                                    console.error('Upload failed:', error);
-                                } finally {
-                                    setUploading(false);
-                                }
-                            }}>
-                                {({getRootProps, getInputProps}) => (
-                                    <section className="w-full">
-                                        <div {...getRootProps()}
-                                             className=" border-3 border-dashed border-blue-800 h-[10rem] rounded-xl cursor-pointer flex flex-col gap-2 justify-center items-center">
-                                            <input {...getInputProps()} />
-                                            <p className="text-gray-700">Húzd ide a pdf fájlt, vagy kattints ide és
-                                                tallózd ki</p>
-                                            <MdPictureAsPdf size="2em" className="text-gray-500"/>
-                                        </div>
-                                    </section>
-                                )}
-                            </Dropzone>
+                            <div>
+                                <Chip color="primary" className="self-start my-1">Infopack</Chip>
+                                <Dropzone onDrop={async (acceptedFiles) => {
+                                    if (!acceptedFiles.length) return;
+                                    const file = acceptedFiles[0];
+                                    setUploading(true);
+                                    try {
+                                        const uploadedBlob = await upload(file.name, file, {
+                                            access: 'public',
+                                            handleUploadUrl: '/api/projectsapi/project/infopack',
+                                        });
+                                        setBlob(uploadedBlob);
+                                        setCreatedProject({...createdProject, infopack: uploadedBlob.url});
+                                    } catch (error) {
+                                        console.error('Upload failed:', error);
+                                    } finally {
+                                        setUploading(false);
+                                    }
+                                }}>
+                                    {({getRootProps, getInputProps}) => (
+                                        <section className="w-full">
+                                            <div {...getRootProps()}
+                                                 className=" p-6 text-center border-3 border-dashed border-blue-800 h-[10rem] rounded-xl cursor-pointer flex flex-col gap-2 justify-center items-center">
+                                                <input {...getInputProps()} />
+                                                <p className="text-gray-700">Húzd ide a pdf fájlt, vagy kattints ide és
+                                                    tallózd ki</p>
+                                                <MdPictureAsPdf size="2em" className="text-gray-500"/>
+                                            </div>
+                                        </section>
+                                    )}
+                                </Dropzone>
+                            </div>
                             {uploading ? <Spinner color="primary"/> :
-                            createdProject.infopack &&
+                                createdProject.infopack &&
                                 <div className="flex flex-row gap-2">
                                     <Chip className="pl-3" startContent={<FaFilePdf/>}
                                           color="primary">{blob.pathname}</Chip>

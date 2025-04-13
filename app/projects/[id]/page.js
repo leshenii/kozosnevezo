@@ -392,9 +392,9 @@ export default function ProjectPage({params}) {
                                         </AutocompleteItem>}
                                     </Autocomplete>
                                 </div>
-                                <div className="flex flex-col gap-2">
-                                    <div className="flex flex-col gap-2 flex-grow !w-full">
-                                        <div className="flex flex-col sm:flex-row items-center gap-2">
+                                <div className="w-full flex flex-col gap-2">
+                                    <div className="w-full flex flex-col gap-2 flex-grow ">
+                                        <div className="w-full flex flex-col sm:flex-row gap-2">
                                             <div>
                                                 <div className="flex flex-col gap-2 ">
                                                     <Autocomplete
@@ -406,6 +406,8 @@ export default function ProjectPage({params}) {
                                                         label="Ország"
                                                         color="primary"
                                                         variant="underlined"
+                                                        fullWidth={true}
+
                                                         defaultSelectedKey={project.country ? countries.getAlpha2Code(project.country, 'hu').toLowerCase() : null}
                                                         onSelectionChange={(selected) => setProject({
                                                             ...project,
@@ -441,13 +443,13 @@ export default function ProjectPage({params}) {
                                                     </div>
 
                                                 </div>
-                                                <iframe className="mt-2" width="300" height="300"
+                                                <iframe className="mt-2" width="100%" height="300"
                                                         style={{border: '0'}}
                                                         loading="lazy"
                                                         allowFullScreen
                                                         src={`https://www.google.com/maps/embed/v1/place?q=${project.location},${project.country}&key=AIzaSyBQpb-zeHME6F8U4pDQIMpZ3gx3ScgnfuE`}></iframe>
                                             </div>
-                                            <div>
+                                            <div className="self-center">
                                                 <p className="text-gray-700 text-sm">{new Date(project.startDate).toLocaleDateString('hu-HU', {
                                                     year: 'numeric',
                                                     month: 'long',
@@ -470,51 +472,7 @@ export default function ProjectPage({params}) {
                                                         endDate: new Date(value.end)
                                                     })}
                                                 />
-                                                <Slider
-                                                    label="Résztvevők / ország"
-                                                    color="primary"
-                                                    radius="full"
-                                                    maxValue={30}
-                                                    minValue={0}
-                                                    step={1}
-                                                    size="sm"
-                                                    showTooltip={true}
-                                                    marks={[
-                                                        {
-                                                            value: 1,
-                                                            label: "1",
-                                                        },
-                                                        {
-                                                            value: 5,
-                                                            label: "5",
-                                                        },
-                                                        {
-                                                            value: 10,
-                                                            label: "10",
-                                                        },
-                                                        {
-                                                            value: 15,
-                                                            label: "15",
-                                                        },
-                                                        {
-                                                            value: 20,
-                                                            label: "20",
-                                                        },
-                                                        {
-                                                            value: 25,
-                                                            label: "25",
-                                                        },
-                                                        {
-                                                            value: 30,
-                                                            label: "30",
-                                                        }
-                                                    ]}
-                                                    value={project.numberOfParticipants || 0}
-                                                    onChange={(value) => setProject({
-                                                        ...project,
-                                                        numberOfParticipants: value
-                                                    })}
-                                                    />
+
 
                                             </div>
                                         </div>
@@ -562,6 +520,51 @@ export default function ProjectPage({params}) {
                                                 </div>
                                             </div>
                                         </div>
+                                        <Slider
+                                            label="Résztvevők / ország"
+                                            color="primary"
+                                            radius="full"
+                                            maxValue={30}
+                                            minValue={0}
+                                            step={1}
+                                            size="sm"
+                                            showTooltip={true}
+                                            marks={[
+                                                {
+                                                    value: 1,
+                                                    label: "1",
+                                                },
+                                                {
+                                                    value: 5,
+                                                    label: "5",
+                                                },
+                                                {
+                                                    value: 10,
+                                                    label: "10",
+                                                },
+                                                {
+                                                    value: 15,
+                                                    label: "15",
+                                                },
+                                                {
+                                                    value: 20,
+                                                    label: "20",
+                                                },
+                                                {
+                                                    value: 25,
+                                                    label: "25",
+                                                },
+                                                {
+                                                    value: 30,
+                                                    label: "30",
+                                                }
+                                            ]}
+                                            value={project.numberOfParticipants || 0}
+                                            onChange={(value) => setProject({
+                                                ...project,
+                                                numberOfParticipants: value
+                                            })}
+                                        />
                                         <Autocomplete
                                             defaultItems={users.map(user => ({
                                                 key: user.id,
@@ -668,7 +671,8 @@ export default function ProjectPage({params}) {
                                     }
                                     {project && project.numberOfParticipants && (
                                         <div className="flex flex-row gap-1">
-                                            <BiSolidUser size="1.5rem" className="text-blue-800"/> Résztevők száma / ország: {project.numberOfParticipants}
+                                            <BiSolidUser size="1.5rem" className="text-blue-800"/> Résztevők száma /
+                                            ország: {project.numberOfParticipants}
                                         </div>
                                     )}
                                     <div className="flex flex-col gap-2 flex-gorw min-w-1/2 w-full">

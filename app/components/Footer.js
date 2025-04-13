@@ -18,7 +18,11 @@ export default function Footer() {
         },
         {
             key: "adatkezelesi_tajekoztato.pdf",
-            label: "Adatkezelési tájékoztató",
+            label: "Adatkezelési tájékoztató (.pdf)",
+        },
+        {
+            key: "privacy-policy",
+            label: "Adatkezelési tájékoztató (.html)",
         },
         {
             key: "felhasznalasi_feltetelek.pdf",

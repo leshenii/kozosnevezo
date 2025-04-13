@@ -51,20 +51,3 @@ html, body {
   @apply text-6xl;
 }
 
-.fab-right {
-  margin: 0px;
-  top: auto;
-  right: 20px;
-  bottom: 20px;
-  left: auto;
-  position: fixed;
-}
-
-.fab-center {
-  top: auto;
-  right: auto;
-  bottom: 10px;
-  left: auto;
-  position: fixed;
-  @apply w-screen;
-}

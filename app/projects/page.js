@@ -397,7 +397,7 @@ export default function ProjectsPage() {
                                     id: null,
                                     name: value
                                 })}
-                                onKeyUp={(e) => {
+                                onKeyDown={(e) => {
                                     e.continuePropagation()
                                     if (e.key === 'Enter') {
                                         setCreatedProject({...createdProject, organization: organizationValue.name});

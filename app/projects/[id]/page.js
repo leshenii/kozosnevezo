@@ -71,6 +71,7 @@ export default function ProjectPage({params}) {
                     .map(project => project.organization)
                     .filter(organization => organization !== null)
                 )]);
+                setOrganizationValue({id: null, name: project.organization});
             })
             .catch(error => {
                 console.error('Error fetching projects:', error)
@@ -239,6 +240,10 @@ export default function ProjectPage({params}) {
         }
     }
 
+    useEffect(() => {
+        console.log(project.organization)
+    }, [project.organization]);
+
     return (
         <div className="responsive-height">
             <Modal isOpen={isDeletionConfirmationModalOpen} size="xs" onClose={onDeletionConfirmationModalClose}>
@@ -364,23 +369,19 @@ export default function ProjectPage({params}) {
                                         label="Egyesület"
                                         color="primary"
                                         variant="underlined"
-                                        selectedKey={null}
+                                        defaultSelectedKey={project.organization ? uniqueOrganizations.find(org => org === project.organization) : null}
                                         inputValue={organizationValue.name}
                                         onInputChange={(value) => setOrganizationValue({
                                             ...organizationValue,
                                             id: null,
                                             name: value
                                         })}
-                                        onKeyUp={(e) => {
-                                            e.continuePropagation()
-                                            if (e.key === 'Enter') {
-                                                setProject({...project, organization: organizationValue.name});
-                                                setUniqueOrganizations([...uniqueOrganizations, organizationValue.name]);
-                                            }
+                                        onBlur={(e) => {
+                                            //e.continuePropagation()
+                                            setProject({...project, organization: organizationValue.name});
                                         }}
                                         onSelectionChange={(key, label) => {
                                             const orga = key ? uniqueOrganizations.find(org => org === key) : null;
-                                            console.log(orga)
                                             if (orga) {
                                                 setProject({...project, organization: orga});
                                                 setOrganizationValue({id: orga, name: orga});

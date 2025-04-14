@@ -51,7 +51,6 @@ import {upload} from '@vercel/blob/client';
 import {head} from "@vercel/blob";
 import {FaCalendarWeek} from "react-icons/fa";
 import {useUser} from "@clerk/nextjs";
-import handleDeleteInfopack from "./[id]/page";
 
 registerLicense(process.env.NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY);
 
@@ -390,23 +389,18 @@ export default function ProjectsPage() {
                                 placeholder="Válassz egy egyesületet vagy adj meg újat"
                                 color="primary"
                                 variant="underlined"
-                                selectedKey={null}
                                 inputValue={organizationValue.name}
                                 onInputChange={(value) => setOrganizationValue({
                                     ...organizationValue,
                                     id: null,
                                     name: value
                                 })}
-                                onKeyDown={(e) => {
+                                onBlur={(e) => {
                                     //e.continuePropagation()
-                                    if (e.keyCode === 13) {
-                                        setCreatedProject({...createdProject, organization: organizationValue.name});
-                                        setUniqueOrganizations([...uniqueOrganizations, organizationValue.name]);
-                                    }
+                                    setCreatedProject({...createdProject, organization: organizationValue.name});
                                 }}
                                 onSelectionChange={(key, label) => {
                                     const orga = key ? uniqueOrganizations.find(org => org === key) : null;
-                                    console.log(orga)
                                     if (orga) {
                                         setCreatedProject({...createdProject, organization: orga});
                                         setOrganizationValue({id: orga, name: orga});
@@ -540,7 +534,7 @@ export default function ProjectsPage() {
                                         })}</span>
                                     </div>}
                             </div>
-                            <div>
+                            <div className="w-full">
                                 <Chip color="primary" className="self-start my-1">Infopack</Chip>
                                 <Dropzone onDrop={async (acceptedFiles) => {
                                     if (!acceptedFiles.length) return;
@@ -562,7 +556,7 @@ export default function ProjectsPage() {
                                     {({getRootProps, getInputProps}) => (
                                         <section className="w-full">
                                             <div {...getRootProps()}
-                                                 className=" p-6 text-center border-3 border-dashed border-blue-800 h-[10rem] rounded-xl cursor-pointer flex flex-col gap-2 justify-center items-center">
+                                                 className="p-6 text-center border-3 border-dashed border-blue-800 h-[10rem] rounded-xl cursor-pointer flex flex-col gap-2 justify-center items-center">
                                                 <input {...getInputProps()} />
                                                 <p className="text-gray-700">Húzd ide a pdf fájlt, vagy kattints ide és
                                                     tallózd ki</p>
@@ -593,7 +587,7 @@ export default function ProjectsPage() {
                                         onPress={onCreationModalClose}>
                                     Mégse
                                 </Button>
-                                <Button variant="ghost" color="success" radius="full" onPress={() => {
+                                <Button variant="ghost" color="success" radius="full" onPress={async () => {
                                     if (!createdProject.type || !createdProject.country) {
                                         addToast({
                                             title: "Hiba",
@@ -604,6 +598,10 @@ export default function ProjectsPage() {
                                             shouldShowTimeoutProgress: true,
                                         })
                                     } else {
+                                        await setCreatedProject({
+                                            ...createdProject,
+                                            organization: organizationValue.name
+                                        });
                                         createProject().then(() => {
                                             window.location.reload();
                                         });

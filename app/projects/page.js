@@ -398,8 +398,8 @@ export default function ProjectsPage() {
                                     name: value
                                 })}
                                 onKeyDown={(e) => {
-                                    e.continuePropagation()
-                                    if (e.key === 'Enter') {
+                                    //e.continuePropagation()
+                                    if (e.keyCode === 13) {
                                         setCreatedProject({...createdProject, organization: organizationValue.name});
                                         setUniqueOrganizations([...uniqueOrganizations, organizationValue.name]);
                                     }

@@ -29,16 +29,16 @@ export default function Home() {
     }, []);
 
     return (
-        <div className="flex flex-col items-center justify-center  pb-[110px] sm:pb-[24px] text-center responsive-height">
-            <span className="kanit-semibold text-4xl sm:text-6xl ">Már nem kevesebb, mint</span>
+        <div className="flex flex-col items-center justify-center pb-[110px] sm:pb-[24px] text-center responsive-height">
+            <span className="kanit-semibold text-2xl sm:text-6xl ">Már nem kevesebb, mint</span>
             { isLoading ?
                 <Spinner color="primary" size="lg" className="py-7"/>
                 :
             <NumberTicker
                 value={numberOfProjects}
-                className="text-6xl sm:text-8xl kanit-bold"
+                className="text-4xl sm:text-8xl kanit-bold"
             />}
-            <span className="kanit-semibold text-4xl sm:text-6xl">projekten vettünk részt.</span>
+            <span className="kanit-semibold text-2xl sm:text-6xl">projekten vettünk részt.</span>
         </div>
     )
 }

@@ -214,7 +214,8 @@ export default function ProjectsPage() {
     }
 
     useEffect(() => {
-        fetchProjects().then(() => setIsLoading(false));
+        fetchProjects()
+
     }, []);
 
     const getProjectTitles = (date) => {

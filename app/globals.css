@@ -19,7 +19,7 @@ html, body {
 /* Apply .h-screen-minus-navbar-mobile on small devices */
 @media (max-width: 640px) {
   .responsive-height {
-    min-height: calc(100vh - 190px);
+    min-height: calc(100vh - 220px);
   }
 }
 

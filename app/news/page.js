@@ -172,7 +172,7 @@ export default function NewsPage() {
                     </div>)}
                 </div>
                 <h1 className="hidden sm:block m-5 title w-2/6 text-center">Hírek</h1>
-                <div className="w-1/6"></div>
+                <div className="w-2/6"></div>
                 {isLoaded && user && user.publicMetadata.role === "admin" && (
                 <div className="hidden sm:block w-1/6 text-right self-end mb-4">
                     <Button color="primary" radius="full" variant="ghost"

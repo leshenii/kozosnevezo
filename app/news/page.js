@@ -139,7 +139,8 @@ export default function NewsPage() {
                     <div className="w-auto flex flex-col sm:mb-3">
                         <div className="flex flex-row gap-2 items-center my-2 sm:mt-8">
                             <Image radius="full" alt="saly_hun" src="/saly_hun.jpg" width={50}></Image>
-                            <p className="text-gray-600">A <span className="italic">Supporters of Alternative Learning for Youth Hungary</span> együttműködésével</p>
+                            <p className="text-gray-600">A <span className="italic">Supporters of Alternative Learning for Youth Hungary</span> együttműködésével
+                            </p>
                         </div>
                         <CheckboxGroup
                             color="primary"
@@ -154,32 +155,35 @@ export default function NewsPage() {
                             }}
                             orientation="horizontal"
                         >
-                            <Checkbox className="mr-1" value="tiktok"><div className="flex flex-row gap-1 items-center"> <BiLogoTiktok/> TikTok</div></Checkbox>
+                            <Checkbox className="mr-1" value="tiktok">
+                                <div className="flex flex-row gap-1 items-center"><BiLogoTiktok/> TikTok</div>
+                            </Checkbox>
                             <Checkbox className="mr-1" value="instagram">
                                 <div className="flex flex-row gap-1 items-center"><BiLogoInstagram/> Instagram</div>
                             </Checkbox>
                             <Checkbox value="levelek">
-                                <div className="flex flex-row gap-1 items-center"><BiMailSend /> Levelek</div>
+                                <div className="flex flex-row gap-1 items-center"><BiMailSend/> Levelek</div>
                             </Checkbox>
                         </CheckboxGroup>
                     </div>
                     {isLoaded && user && user.publicMetadata.role === "admin" && (
-                    <div className="sm:hidden my-3 sm:my-auto h-full flex justify-end">
-                        <Button color="primary" radius="full" variant="ghost"
-                                onPress={onOpen} startContent={<BiMailSend size="1.5em" />}>
-                            <p className='kanit-semibold text-large'>Új hírt közlök</p>
-                        </Button>
-                    </div>)}
+                        <div className="sm:hidden my-3 sm:my-auto h-full flex justify-end">
+                            <Button color="primary" radius="full" variant="ghost"
+                                    onPress={onOpen} startContent={<BiMailSend size="1.5em"/>}>
+                                <p className='kanit-semibold text-large'>Új hírt közlök</p>
+                            </Button>
+                        </div>)}
                 </div>
                 <h1 className="hidden sm:block m-5 title w-2/6 text-center">Hírek</h1>
-                <div className="w-2/6"></div>
-                {isLoaded && user && user.publicMetadata.role === "admin" && (
-                <div className="hidden sm:block w-1/6 text-right self-end mb-4">
-                    <Button color="primary" radius="full" variant="ghost"
-                            onPress={onOpen} startContent={<BiMailSend size="1.5em" />}>
-                        <p className='kanit-semibold text-large'>Új hírt közlök</p>
-                    </Button>
-                </div>)}
+                {isLoaded && user && user.publicMetadata.role === "admin" ? (
+                        <div className="hidden sm:block w-2/6 text-right self-end mb-4">
+                            <Button color="primary" radius="full" variant="ghost"
+                                    onPress={onOpen} startContent={<BiMailSend size="1.5em"/>}>
+                                <p className='kanit-semibold text-large'>Új hírt közlök</p>
+                            </Button>
+                        </div>) :
+                    <div className="w-2/6"></div>
+                }
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-4 w-11/12 gap-4 mb-4">
                 {isFeedLoading ? (

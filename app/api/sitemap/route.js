@@ -1,5 +1,5 @@
-// File: pages/api/sitemap.js
-export default async function handler(req, res) {
+// File: app/api/sitemap/route.js
+export async function GET(req) {
     const baseUrl = 'https://kozosnevezoegyesulet.hu'; // Replace with your website's base URL
 
     // Define static routes
@@ -37,7 +37,8 @@ export default async function handler(req, res) {
         .join('')}
 </urlset>`;
 
-    // Set response headers
-    res.setHeader('Content-Type', 'application/xml');
-    res.status(200).send(sitemap);
+    // Return the response
+    return new Response(sitemap, {
+        headers: {'Content-Type': 'application/xml'},
+    });
 }
